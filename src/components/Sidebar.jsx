@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/maquinaria', label: 'Maquinaria' },
-  { to: '/nuevo-reporte', label: 'Nuevo reporte' },
   { to: '/reportes', label: 'Reportes' },
   { to: '/usuarios', label: 'Usuarios' },
 ]
