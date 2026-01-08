@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { enableIndexedDbPersistence, initializeFirestore } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,5 +22,6 @@ enableIndexedDbPersistence(db).catch(() => {
 })
 
 const auth = getAuth(app)
+const storage = getStorage(app)
 
-export { app, auth, db }
+export { app, auth, db, storage }

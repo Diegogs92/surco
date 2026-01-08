@@ -9,6 +9,8 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
+import Modal from '../components/Modal.jsx'
+import { uploadFiles } from '../utils/uploadFiles.js'
 
 const initialForm = {
   equipoId: '',
@@ -24,6 +26,10 @@ function NuevoReporte() {
   const [equipos, setEquipos] = useState([])
   const [form, setForm] = useState(initialForm)
   const [saving, setSaving] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(true)
+  const [photos, setPhotos] = useState([])
+  const [photoPreviews, setPhotoPreviews] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const q = query(collection(db, 'maquinaria'), orderBy('nombre', 'asc'))
@@ -36,6 +42,18 @@ function NuevoReporte() {
     })
     return () => unsub()
   }, [])
+
+  useEffect(() => {
+    if (!photos.length) {
+      setPhotoPreviews([])
+      return undefined
+    }
+    const previews = photos.map((file) => URL.createObjectURL(file))
+    setPhotoPreviews(previews)
+    return () => {
+      previews.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [photos])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -51,16 +69,38 @@ function NuevoReporte() {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handlePhotoChange = (event) => {
+    const files = Array.from(event.target.files || [])
+    setPhotos(files)
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (!form.equipoId || !form.descripcion) return
     setSaving(true)
+    setError('')
+    let photoUrls = []
+    let photoStatus = 'ok'
+    if (photos.length) {
+      try {
+        photoUrls = await uploadFiles(photos, 'reportes')
+      } catch (uploadError) {
+        photoStatus = 'pendiente'
+        setError(
+          'No se pudieron subir las fotos. Se guardo el reporte sin imagenes.',
+        )
+      }
+    }
     await addDoc(collection(db, 'reportes'), {
       ...form,
+      fotos: photoUrls,
+      fotosEstado: photoStatus,
       createdAt: serverTimestamp(),
     })
     setSaving(false)
     setForm(initialForm)
+    setPhotos([])
+    setIsModalOpen(false)
   }
 
   return (
@@ -68,9 +108,54 @@ function NuevoReporte() {
       <PageHeader
         title="Nuevo reporte"
         subtitle="Registra mantenimientos preventivos o correctivos."
+        actions={
+          <button
+            className="primary-button"
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Crear reporte
+          </button>
+        }
       />
       <div className="card">
-        <form className="form-grid wide" onSubmit={handleSubmit}>
+        <h2>Captura ordenes sin friccion</h2>
+        <p>
+          Usa el boton para registrar tareas preventivas o correctivas. Se guarda
+          incluso con conectividad limitada y se sincroniza al volver.
+        </p>
+        <div className="tips-grid">
+          <div>
+            <strong>Incluye fotos</strong>
+            <span>Documenta el estado del equipo.</span>
+          </div>
+          <div>
+            <strong>Prioriza</strong>
+            <span>Define urgencia para coordinar equipos.</span>
+          </div>
+          <div>
+            <strong>Estado</strong>
+            <span>Actualiza cuando se complete.</span>
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        open={isModalOpen}
+        title="Nuevo reporte"
+        onClose={() => setIsModalOpen(false)}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="reporte-form"
+            disabled={saving}
+          >
+            {saving ? 'Guardando...' : 'Guardar reporte'}
+          </button>
+        }
+      >
+        <form className="form-grid wide" id="reporte-form" onSubmit={handleSubmit}>
           <select
             className="input"
             name="equipoId"
@@ -130,11 +215,25 @@ function NuevoReporte() {
             rows="4"
             required
           />
-          <button className="primary-button" type="submit" disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar reporte'}
-          </button>
+          <label className="file-input">
+            <span>Fotos del reporte</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoChange}
+            />
+          </label>
+          {photoPreviews.length > 0 && (
+            <div className="photo-grid">
+              {photoPreviews.map((src) => (
+                <img key={src} src={src} alt="Vista previa" />
+              ))}
+            </div>
+          )}
+          {error && <p className="form-error">{error}</p>}
         </form>
-      </div>
+      </Modal>
     </div>
   )
 }

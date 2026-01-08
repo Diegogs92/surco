@@ -78,6 +78,16 @@ function Reportes() {
           <div className="table">
             {filtered.map((reporte) => (
               <div className="table-row report-row" key={reporte.id}>
+                <div className="thumb">
+                  {reporte.fotos?.[0] ? (
+                    <img
+                      src={reporte.fotos[0]}
+                      alt={reporte.equipoNombre || 'Reporte'}
+                    />
+                  ) : (
+                    <span>Sin foto</span>
+                  )}
+                </div>
                 <div>
                   <strong>{reporte.equipoNombre || 'Equipo'}</strong>
                   <span>{reporte.tipo}</span>
@@ -87,6 +97,9 @@ function Reportes() {
                   <span>
                     {reporte.prioridad} · {reporte.fecha}
                   </span>
+                  {reporte.fotosEstado === 'pendiente' && (
+                    <span className="badge status-warning">Fotos pendientes</span>
+                  )}
                 </div>
                 <div>
                   <select
