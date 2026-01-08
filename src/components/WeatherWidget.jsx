@@ -17,18 +17,29 @@ function WeatherWidget() {
         id: docSnap.id,
         ...docSnap.data(),
       }))
-      const firstWithCoords = campos.find(
-        (campo) =>
-          campo.lat !== null &&
-          campo.lat !== undefined &&
-          campo.lng !== null &&
-          campo.lng !== undefined,
-      )
-      if (firstWithCoords) {
-        setCoords({ lat: firstWithCoords.lat, lng: firstWithCoords.lng })
-      } else {
+      const coordsList = campos
+        .map((campo) => ({
+          lat: Number(campo.lat),
+          lng: Number(campo.lng),
+        }))
+        .filter(
+          (coord) => Number.isFinite(coord.lat) && Number.isFinite(coord.lng),
+        )
+      if (!coordsList.length) {
         setCoords(null)
+        return
       }
+      const avg = coordsList.reduce(
+        (acc, coord) => ({
+          lat: acc.lat + coord.lat,
+          lng: acc.lng + coord.lng,
+        }),
+        { lat: 0, lng: 0 },
+      )
+      setCoords({
+        lat: avg.lat / coordsList.length,
+        lng: avg.lng / coordsList.length,
+      })
     })
     return () => unsub()
   }, [])

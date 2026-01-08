@@ -7,7 +7,7 @@ import {
   query,
   serverTimestamp,
 } from 'firebase/firestore'
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
 import { uploadFiles } from '../utils/uploadFiles.js'
@@ -22,15 +22,7 @@ const initialForm = {
   lat: '',
   lng: '',
 }
-
-function LocationPicker({ onChange }) {
-  useMapEvents({
-    click(event) {
-      onChange(event.latlng)
-    },
-  })
-  return null
-}
+const defaultCenter = { lat: -34.6037, lng: -58.3816 }
 
 function Campos() {
   const [campos, setCampos] = useState([])
@@ -39,6 +31,9 @@ function Campos() {
   const [photoPreviews, setPhotoPreviews] = useState([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+  })
 
   useEffect(() => {
     const q = query(collection(db, 'campos'), orderBy('createdAt', 'desc'))
@@ -64,9 +59,9 @@ function Campos() {
 
   const mapCenter = useMemo(() => {
     if (form.lat && form.lng) {
-      return [Number(form.lat), Number(form.lng)]
+      return { lat: Number(form.lat), lng: Number(form.lng) }
     }
-    return [-34.6037, -58.3816]
+    return defaultCenter
   }, [form.lat, form.lng])
 
   const handleChange = (event) => {
@@ -82,8 +77,8 @@ function Campos() {
   const handleMapChange = ({ lat, lng }) => {
     setForm((prev) => ({
       ...prev,
-      lat: lat.toFixed(6),
-      lng: lng.toFixed(6),
+      lat: Number(lat).toFixed(6),
+      lng: Number(lng).toFixed(6),
     }))
   }
 
@@ -175,21 +170,35 @@ function Campos() {
               onChange={handleChange}
             />
             <div className="map-box">
-              <MapContainer
-                key={`${mapCenter[0]}-${mapCenter[1]}`}
-                center={mapCenter}
-                zoom={12}
-                scrollWheelZoom={false}
-              >
-                <TileLayer
-                  attribution="&copy; OpenStreetMap"
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {form.lat && form.lng && (
-                  <Marker position={[Number(form.lat), Number(form.lng)]} />
-                )}
-                <LocationPicker onChange={handleMapChange} />
-              </MapContainer>
+              {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
+                <div className="empty-state">
+                  Configura `VITE_GOOGLE_MAPS_API_KEY` para mostrar el mapa.
+                </div>
+              ) : isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={{ width: '100%', height: '100%' }}
+                  center={mapCenter}
+                  zoom={12}
+                  onClick={(event) =>
+                    handleMapChange({
+                      lat: event.latLng.lat(),
+                      lng: event.latLng.lng(),
+                    })
+                  }
+                  options={{
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                  }}
+                >
+                  {form.lat && form.lng && (
+                    <Marker
+                      position={{ lat: Number(form.lat), lng: Number(form.lng) }}
+                    />
+                  )}
+                </GoogleMap>
+              ) : (
+                <div className="empty-state">Cargando mapa...</div>
+              )}
             </div>
             <div className="form-grid">
               <input
@@ -256,7 +265,8 @@ function Campos() {
                   <div>
                     {campo.lat && campo.lng ? (
                       <span>
-                        {campo.lat.toFixed(4)}, {campo.lng.toFixed(4)}
+                        {Number(campo.lat).toFixed(4)},{' '}
+                        {Number(campo.lng).toFixed(4)}
                       </span>
                     ) : (
                       <span>Sin coordenadas</span>
