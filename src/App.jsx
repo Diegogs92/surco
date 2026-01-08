@@ -7,22 +7,26 @@ import NuevoReporte from './pages/NuevoReporte.jsx'
 import Reportes from './pages/Reportes.jsx'
 import Usuarios from './pages/Usuarios.jsx'
 import NotFound from './pages/NotFound.jsx'
+import BackgroundVideo from './components/BackgroundVideo.jsx'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppLayout />}>
-          <Route index element={<Navigate to="/maquinaria" replace />} />
-          <Route path="/maquinaria" element={<Maquinaria />} />
-          <Route path="/nuevo-reporte" element={<NuevoReporte />} />
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/usuarios" element={<Usuarios />} />
+    <div className="app-root">
+      <BackgroundVideo />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route index element={<Navigate to="/maquinaria" replace />} />
+            <Route path="/maquinaria" element={<Maquinaria />} />
+            <Route path="/nuevo-reporte" element={<NuevoReporte />} />
+            <Route path="/reportes" element={<Reportes />} />
+            <Route path="/usuarios" element={<Usuarios />} />
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   )
 }
 
