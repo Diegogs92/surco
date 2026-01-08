@@ -6,7 +6,7 @@ function NotFound() {
       <div className="card">
         <h1>Pagina no encontrada</h1>
         <p>El enlace no existe o fue movido.</p>
-        <Link className="primary-button" to="/maquinaria">
+        <Link className="primary-button" to="/dashboard">
           Volver al panel
         </Link>
       </div>

@@ -39,20 +39,20 @@ function Login() {
         </p>
         <div className="auth-grid">
           <div>
-            <strong>Maquinaria</strong>
-            <span>Registro y estado</span>
+            <strong>Campos</strong>
+            <span>Ubicacion y lotes</span>
           </div>
           <div>
-            <strong>Reportes</strong>
-            <span>Seguimiento y alertas</span>
+            <strong>Cultivos</strong>
+            <span>Campanas y rendimiento</span>
           </div>
           <div>
-            <strong>Usuarios</strong>
-            <span>Roles y control</span>
+            <strong>Tareas</strong>
+            <span>Planificacion diaria</span>
           </div>
           <div>
-            <strong>Offline</strong>
-            <span>Trabajo continuo</span>
+            <strong>Personal</strong>
+            <span>Asistencia y costos</span>
           </div>
         </div>
       </div>

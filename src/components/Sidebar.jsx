@@ -1,9 +1,14 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/campos', label: 'Campos' },
+  { to: '/cultivos', label: 'Cultivos' },
+  { to: '/tareas', label: 'Tareas' },
   { to: '/maquinaria', label: 'Maquinaria' },
-  { to: '/reportes', label: 'Reportes' },
-  { to: '/usuarios', label: 'Usuarios' },
+  { to: '/personal', label: 'Personal' },
+  { to: '/insumos', label: 'Insumos' },
+  { to: '/costos', label: 'Costos' },
 ]
 
 function Sidebar() {

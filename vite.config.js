@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa-192.svg', 'pwa-512.svg'],
+      includeAssets: ['pwa-192.svg', 'pwa-512.svg', 'surco logo.svg'],
       manifest: {
         name: 'Surco Mantenimiento',
         short_name: 'Surco',

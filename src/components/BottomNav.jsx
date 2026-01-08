@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
+  { to: '/dashboard', label: 'Inicio' },
+  { to: '/campos', label: 'Campos' },
+  { to: '/tareas', label: 'Tareas' },
   { to: '/maquinaria', label: 'Maquinaria' },
-  { to: '/reportes', label: 'Reportes' },
-  { to: '/usuarios', label: 'Usuarios' },
 ]
 
 function BottomNav() {

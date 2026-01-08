@@ -1,5 +1,6 @@
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import WeatherWidget from './WeatherWidget.jsx'
 
 function Topbar() {
   const { theme, toggleTheme } = useTheme()
@@ -8,9 +9,10 @@ function Topbar() {
   return (
     <header className="topbar">
       <div>
-        <p className="topbar-title">Panel operativo</p>
-        <p className="topbar-subtitle">Gestiona equipos y reportes en minutos</p>
+        <p className="topbar-title">Operacion agricola</p>
+        <p className="topbar-subtitle">Campos, cultivos y costos en un solo lugar</p>
       </div>
+      <WeatherWidget />
       <div className="topbar-actions">
         <button className="ghost-button" onClick={toggleTheme} type="button">
           Tema: {theme === 'dark' ? 'Oscuro' : 'Claro'}
