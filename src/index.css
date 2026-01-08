@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Spectral:wght@500;600;700&display=swap');
 
 :root {
   font-synthesis: none;
@@ -13,8 +13,12 @@
   --radius-m: 16px;
   --radius-s: 12px;
   --shadow: 0 20px 50px rgba(8, 99, 117, 0.15);
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Space Grotesk', sans-serif;
+  --font-display: 'Spectral', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.02em;
+  --leading-base: 1.6;
+  --leading-tight: 1.2;
 }
 
 [data-theme='light'] {
@@ -45,6 +49,7 @@
 body {
   margin: 0;
   font-family: var(--font-body);
+  line-height: var(--leading-base);
   background: radial-gradient(
       circle at top right,
       rgba(35, 150, 127, 0.2),
@@ -70,6 +75,8 @@ h2,
 h3 {
   font-family: var(--font-display);
   margin: 0 0 8px;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
 }
 
 p {
@@ -114,7 +121,8 @@ p {
 
 .brand-title {
   font-weight: 700;
-  font-size: 20px;
+  font-size: 22px;
+  letter-spacing: var(--tracking-tight);
 }
 
 .brand-subtitle {
@@ -133,6 +141,7 @@ p {
   border-radius: var(--radius-s);
   border: 1px solid transparent;
   transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .nav-link:hover {
@@ -169,11 +178,14 @@ p {
   font-weight: 600;
   font-size: 16px;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
 }
 
 .topbar-subtitle {
-  font-size: 24px;
+  font-size: 26px;
   font-family: var(--font-display);
+  letter-spacing: var(--tracking-tight);
 }
 
 .topbar-actions {
@@ -197,6 +209,7 @@ p {
   display: block;
   font-size: 12px;
   color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
 .avatar {
@@ -239,6 +252,8 @@ p {
 
 .page-header p {
   color: var(--text-muted);
+  font-size: 14px;
+  max-width: 520px;
 }
 
 .page-actions {
@@ -276,7 +291,8 @@ p {
 
 .stat-card h3 {
   margin: 6px 0;
-  font-size: 28px;
+  font-size: 30px;
+  letter-spacing: var(--tracking-tight);
 }
 
 .stat-label {
@@ -334,6 +350,7 @@ select {
   background: var(--color-primary);
   color: white;
   font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
