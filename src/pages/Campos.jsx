@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -23,6 +24,7 @@ const initialForm = {
   lng: '',
 }
 const defaultCenter = { lat: -34.6037, lng: -58.3816 }
+const initialLoteForm = { nombre: '', tamano: '', descripcion: '' }
 
 function Campos() {
   const [campos, setCampos] = useState([])
@@ -38,6 +40,15 @@ function Campos() {
   const [editPreviews, setEditPreviews] = useState([])
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState('')
+  const [loteCampo, setLoteCampo] = useState(null)
+  const [loteForm, setLoteForm] = useState(initialLoteForm)
+  const [savingLote, setSavingLote] = useState(false)
+  const [loteError, setLoteError] = useState('')
+  const [editLoteCampo, setEditLoteCampo] = useState(null)
+  const [editLote, setEditLote] = useState(null)
+  const [editLoteForm, setEditLoteForm] = useState(initialLoteForm)
+  const [savingEditLote, setSavingEditLote] = useState(false)
+  const [editLoteError, setEditLoteError] = useState('')
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
   })
@@ -219,6 +230,96 @@ function Campos() {
     await deleteDoc(doc(db, 'campos', campo.id))
   }
 
+  const openLoteModal = (campo) => {
+    setLoteCampo(campo)
+    setLoteForm(initialLoteForm)
+    setLoteError('')
+  }
+
+  const handleLoteChange = (event) => {
+    const { name, value } = event.target
+    setLoteForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleLoteSubmit = async (event) => {
+    event.preventDefault()
+    if (!loteCampo || !loteForm.nombre) return
+    setSavingLote(true)
+    setLoteError('')
+    const tamanoValue = loteForm.tamano ? Number(loteForm.tamano) : null
+    const lotePayload = {
+      id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      nombre: loteForm.nombre,
+      tamano: Number.isNaN(tamanoValue) ? null : tamanoValue,
+      descripcion: loteForm.descripcion || '',
+      createdAt: new Date().toISOString(),
+    }
+    try {
+      await updateDoc(doc(db, 'campos', loteCampo.id), {
+        lotes: arrayUnion(lotePayload),
+      })
+      setLoteCampo(null)
+    } catch {
+      setLoteError('No se pudo guardar el lote.')
+    } finally {
+      setSavingLote(false)
+    }
+  }
+
+  const openEditLote = (campo, lote) => {
+    setEditLoteCampo(campo)
+    setEditLote(lote)
+    setEditLoteForm({
+      nombre: lote.nombre || '',
+      tamano: lote.tamano ?? '',
+      descripcion: lote.descripcion || '',
+    })
+    setEditLoteError('')
+  }
+
+  const handleEditLoteChange = (event) => {
+    const { name, value } = event.target
+    setEditLoteForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleEditLoteSubmit = async (event) => {
+    event.preventDefault()
+    if (!editLoteCampo || !editLote || !editLoteForm.nombre) return
+    setSavingEditLote(true)
+    setEditLoteError('')
+    const tamanoValue = editLoteForm.tamano ? Number(editLoteForm.tamano) : null
+    const updatedLotes = (editLoteCampo.lotes || []).map((item) =>
+      item.id === editLote.id
+        ? {
+            ...item,
+            nombre: editLoteForm.nombre,
+            tamano: Number.isNaN(tamanoValue) ? null : tamanoValue,
+            descripcion: editLoteForm.descripcion || '',
+          }
+        : item,
+    )
+    try {
+      await updateDoc(doc(db, 'campos', editLoteCampo.id), {
+        lotes: updatedLotes,
+      })
+      setEditLoteCampo(null)
+      setEditLote(null)
+    } catch {
+      setEditLoteError('No se pudo guardar el lote.')
+    } finally {
+      setSavingEditLote(false)
+    }
+  }
+
+  const handleDeleteLote = async (campo, lote) => {
+    const confirmDelete = window.confirm('Eliminar lote?')
+    if (!confirmDelete) return
+    const updatedLotes = (campo.lotes || []).filter((item) => item.id !== lote.id)
+    await updateDoc(doc(db, 'campos', campo.id), {
+      lotes: updatedLotes,
+    })
+  }
+
   return (
     <div className="page">
       <PageHeader
@@ -310,7 +411,11 @@ function Campos() {
               </div>
             )}
             {error && <p className="form-error">{error}</p>}
-            <button className="primary-button" type="submit" disabled={saving}>
+            <button
+              className="primary-button field-action"
+              type="submit"
+              disabled={saving}
+            >
               {saving ? 'Guardando...' : 'Guardar campo'}
             </button>
           </form>
@@ -353,12 +458,57 @@ function Campos() {
                       Editar
                     </button>
                     <button
+                      className="icon-button"
+                      type="button"
+                      onClick={() => openLoteModal(campo)}
+                    >
+                      Agregar lote
+                    </button>
+                    <button
                       className="icon-button danger"
                       type="button"
                       onClick={() => handleDelete(campo)}
                     >
                       Eliminar
                     </button>
+                  </div>
+                  <div className="row-details">
+                    <span className="detail-label">Lotes</span>
+                    {campo.lotes?.length ? (
+                      <div className="lote-list">
+                        {campo.lotes.map((lote) => (
+                          <div className="lote-chip" key={lote.id}>
+                            <strong>{lote.nombre}</strong>
+                            <span>
+                              {lote.tamano ? `${lote.tamano} ha` : 'Tamano sin definir'}
+                            </span>
+                            {lote.descripcion ? (
+                              <span className="lote-description">{lote.descripcion}</span>
+                            ) : (
+                              <span className="lote-description">Sin descripcion</span>
+                            )}
+                            <div className="lote-actions">
+                              <button
+                                className="icon-button"
+                                type="button"
+                                onClick={() => openEditLote(campo, lote)}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="icon-button danger"
+                                type="button"
+                                onClick={() => handleDeleteLote(campo, lote)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="detail-muted">Sin lotes registrados.</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -471,6 +621,97 @@ function Campos() {
             </div>
           )}
           {editError && <p className="form-error">{editError}</p>}
+        </form>
+      </Modal>
+
+      <Modal
+        open={Boolean(loteCampo)}
+        title="Nuevo lote"
+        onClose={() => setLoteCampo(null)}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="lote-form"
+            disabled={savingLote}
+          >
+            {savingLote ? 'Guardando...' : 'Guardar lote'}
+          </button>
+        }
+      >
+        <form className="form-grid" id="lote-form" onSubmit={handleLoteSubmit}>
+          <input
+            className="input"
+            name="nombre"
+            placeholder="Nombre del lote"
+            value={loteForm.nombre}
+            onChange={handleLoteChange}
+            required
+          />
+          <input
+            className="input"
+            type="number"
+            name="tamano"
+            placeholder="Tamano (ha)"
+            value={loteForm.tamano}
+            onChange={handleLoteChange}
+          />
+          <textarea
+            className="textarea"
+            name="descripcion"
+            placeholder="Descripcion"
+            rows={3}
+            value={loteForm.descripcion}
+            onChange={handleLoteChange}
+          />
+          {loteError && <p className="form-error">{loteError}</p>}
+        </form>
+      </Modal>
+
+      <Modal
+        open={Boolean(editLoteCampo && editLote)}
+        title="Editar lote"
+        onClose={() => {
+          setEditLoteCampo(null)
+          setEditLote(null)
+        }}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="edit-lote-form"
+            disabled={savingEditLote}
+          >
+            {savingEditLote ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        }
+      >
+        <form className="form-grid" id="edit-lote-form" onSubmit={handleEditLoteSubmit}>
+          <input
+            className="input"
+            name="nombre"
+            placeholder="Nombre del lote"
+            value={editLoteForm.nombre}
+            onChange={handleEditLoteChange}
+            required
+          />
+          <input
+            className="input"
+            type="number"
+            name="tamano"
+            placeholder="Tamano (ha)"
+            value={editLoteForm.tamano}
+            onChange={handleEditLoteChange}
+          />
+          <textarea
+            className="textarea"
+            name="descripcion"
+            placeholder="Descripcion"
+            rows={3}
+            value={editLoteForm.descripcion}
+            onChange={handleEditLoteChange}
+          />
+          {editLoteError && <p className="form-error">{editLoteError}</p>}
         </form>
       </Modal>
     </div>
