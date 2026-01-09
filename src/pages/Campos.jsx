@@ -18,7 +18,6 @@ import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   nombre: '',
-  ubicacion: '',
   superficie: '',
   estado: 'Activo',
   lat: '',
@@ -155,7 +154,6 @@ function Campos() {
     setEditCampo(campo)
     setEditForm({
       nombre: campo.nombre || '',
-      ubicacion: campo.ubicacion || '',
       superficie: campo.superficie || '',
       estado: campo.estado || 'Activo',
       lat: campo.lat ?? '',
@@ -240,13 +238,6 @@ function Campos() {
               value={form.nombre}
               onChange={handleChange}
               required
-            />
-            <input
-              className="input"
-              name="ubicacion"
-              placeholder="Ubicacion"
-              value={form.ubicacion}
-              onChange={handleChange}
             />
             <input
               className="input"
@@ -361,7 +352,6 @@ function Campos() {
                     ) : (
                       <span>Sin coordenadas</span>
                     )}
-                    <span>{campo.ubicacion || 'Sin ubicacion'}</span>
                   </div>
                   <div>
                     <span>{campo.superficie} ha</span>
@@ -413,13 +403,6 @@ function Campos() {
               value={editForm?.nombre || ''}
               onChange={handleEditChange}
               required
-            />
-            <input
-              className="input"
-              name="ubicacion"
-              placeholder="Ubicacion"
-              value={editForm?.ubicacion || ''}
-              onChange={handleEditChange}
             />
           <input
             className="input"
