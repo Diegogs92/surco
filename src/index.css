@@ -24,8 +24,8 @@
 [data-theme='light'] {
   color-scheme: light;
   --bg-main: #f6f3f2;
-  --bg-panel: rgba(255, 255, 255, 0.68);
-  --bg-muted: rgba(239, 233, 232, 0.55);
+  --bg-panel: rgba(255, 255, 255, 0.52);
+  --bg-muted: rgba(239, 233, 232, 0.4);
   --text-main: #1a1616;
   --text-muted: #4a3d3b;
   --border: rgba(35, 150, 127, 0.16);
@@ -34,8 +34,8 @@
 [data-theme='dark'] {
   color-scheme: dark;
   --bg-main: #141212;
-  --bg-panel: rgba(31, 27, 27, 0.65);
-  --bg-muted: rgba(42, 36, 35, 0.52);
+  --bg-panel: rgba(31, 27, 27, 0.5);
+  --bg-muted: rgba(42, 36, 35, 0.38);
   --text-main: #f7f4f3;
   --text-muted: #b5a8a6;
   --border: rgba(227, 208, 216, 0.14);
@@ -469,7 +469,7 @@ select {
   padding: 8px 10px;
   border-radius: var(--radius-s);
   border: 1px solid var(--border);
-  background: var(--bg-muted);
+  background: rgba(255, 255, 255, 0.38);
   color: var(--text-main);
   font-family: var(--font-body);
   font-size: 13px;
@@ -488,7 +488,7 @@ select:hover {
 .textarea:focus,
 select:focus {
   border-color: var(--color-primary);
-  background: var(--bg-panel);
+  background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 0 0 3px rgba(35, 150, 127, 0.1);
 }
 
@@ -561,7 +561,7 @@ select:focus {
   padding: 8px 14px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: var(--bg-panel);
+  background: rgba(255, 255, 255, 0.4);
   color: var(--text-main);
   cursor: pointer;
   font-size: 12.5px;
@@ -604,14 +604,14 @@ select:focus {
   gap: 10px;
   padding: 8px 10px;
   border-radius: var(--radius-s);
-  background: var(--bg-muted);
+  background: rgba(255, 255, 255, 0.34);
   backdrop-filter: blur(10px);
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   border: 1px solid transparent;
 }
 
 .table-row:hover {
-  background: rgba(35, 150, 127, 0.08);
+  background: rgba(35, 150, 127, 0.12);
   transform: translateY(-1px);
   border-color: rgba(35, 150, 127, 0.2);
   box-shadow: 0 2px 8px rgba(35, 150, 127, 0.08);
@@ -650,13 +650,13 @@ select:focus {
   gap: 2px;
   padding: 6px 8px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.3);
   border: 1px solid var(--border);
   font-size: 12px;
 }
 
 [data-theme='light'] .lote-chip {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .lote-chip strong {
@@ -927,7 +927,7 @@ select:focus {
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--bg-muted);
+  background: rgba(255, 255, 255, 0.4);
   color: var(--text-main);
   font-family: var(--font-body);
   font-size: 12.5px;
@@ -1116,7 +1116,7 @@ select:focus {
   padding: 7px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--bg-panel);
+  background: rgba(255, 255, 255, 0.4);
   color: var(--text-main);
   cursor: pointer;
   font-size: 12px;
