@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa-192.svg', 'pwa-512.svg', 'surco logo.svg'],
+      includeAssets: ['surco logo.svg'],
       manifest: {
         name: 'Surco',
         short_name: 'Surco',
@@ -18,12 +18,7 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'pwa-192.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml',
-          },
-          {
-            src: 'pwa-512.svg',
+            src: 'surco logo.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
           },
