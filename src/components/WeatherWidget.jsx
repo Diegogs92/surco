@@ -96,22 +96,44 @@ function WeatherWidget() {
       setError('')
       try {
         const params = new URLSearchParams({
-          latitude: coords.lat,
-          longitude: coords.lng,
+          latitude: coords.lat.toFixed(4),
+          longitude: coords.lng.toFixed(4),
           current: 'temperature_2m,wind_speed_10m,precipitation,weather_code',
           hourly:
             'temperature_2m,precipitation,precipitation_probability,weather_code',
           timezone: 'auto',
+          forecast_days: 1,
         })
-        const response = await fetch(`${WEATHER_ENDPOINT}?${params}`)
+        const url = `${WEATHER_ENDPOINT}?${params}`
+        console.log('Fetching weather from:', url)
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        })
+
+        console.log('Weather API response status:', response.status)
+
         if (!response.ok) {
-          throw new Error('Weather request failed')
+          const errorText = await response.text()
+          console.error('Weather API error:', errorText)
+          throw new Error(`Weather API returned ${response.status}`)
         }
+
         const data = await response.json()
+        console.log('Weather data received:', data)
+
+        if (!data || !data.current) {
+          throw new Error('Invalid weather data structure')
+        }
+
         setWeather(data)
         setLoading(false)
       } catch (err) {
-        setError('No se pudo obtener el clima.')
+        console.error('Weather fetch error:', err)
+        setError(`Error: ${err.message}`)
         setLoading(false)
       }
     }

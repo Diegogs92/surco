@@ -1,21 +1,32 @@
-function Modal({ open, title, onClose, children, actions }) {
+function Modal({ open, title, subtitle, onClose, children, actions }) {
   if (!open) return null
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
+    <div className="modal-backdrop" onClick={handleBackdropClick} role="presentation">
       <div
         className="modal"
         role="dialog"
         aria-modal="true"
-        onClick={(event) => event.stopPropagation()}
+        aria-labelledby="modal-title"
       >
         <header className="modal-header">
-          <div>
-            <h2>{title}</h2>
-            <p>Completa los datos principales y guarda.</p>
+          <div className="modal-title-section">
+            <h2 id="modal-title">{title}</h2>
+            {subtitle && <p className="modal-subtitle">{subtitle}</p>}
           </div>
-          <button className="ghost-button" type="button" onClick={onClose}>
-            Cerrar
+          <button
+            className="icon-button modal-close"
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar modal"
+          >
+            ✕
           </button>
         </header>
         <div className="modal-body">{children}</div>
