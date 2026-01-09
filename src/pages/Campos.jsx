@@ -19,7 +19,6 @@ import Modal from '../components/Modal.jsx'
 const initialForm = {
   nombre: '',
   superficie: '',
-  estado: 'Activo',
   lat: '',
   lng: '',
 }
@@ -155,7 +154,6 @@ function Campos() {
     setEditForm({
       nombre: campo.nombre || '',
       superficie: campo.superficie || '',
-      estado: campo.estado || 'Activo',
       lat: campo.lat ?? '',
       lng: campo.lng ?? '',
     })
@@ -248,16 +246,6 @@ function Campos() {
               onChange={handleChange}
               required
             />
-            <select
-              className="input"
-              name="estado"
-              value={form.estado}
-              onChange={handleChange}
-            >
-              <option>Activo</option>
-              <option>En descanso</option>
-              <option>Arrendado</option>
-            </select>
             <div className="map-box">
               {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
                 <div className="empty-state">
@@ -355,7 +343,6 @@ function Campos() {
                   </div>
                   <div>
                     <span>{campo.superficie} ha</span>
-                    <span>{campo.estado}</span>
                   </div>
                   <div className="row-actions">
                     <button
@@ -413,16 +400,6 @@ function Campos() {
             onChange={handleEditChange}
             required
           />
-          <select
-            className="input"
-            name="estado"
-            value={editForm?.estado || 'Activo'}
-            onChange={handleEditChange}
-          >
-            <option>Activo</option>
-            <option>En descanso</option>
-            <option>Arrendado</option>
-          </select>
           <div className="map-box">
             {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
               <div className="empty-state">
