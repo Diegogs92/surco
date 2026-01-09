@@ -44,7 +44,7 @@ function Topbar() {
 
   return (
     <header className="topbar">
-      <div className="brand-inline">
+      <div className="brand-inline mobile-only">
         <img className="brand-logo" src="/surco%20logo.svg" alt="Surco" />
         <div>
           <p className="brand-title">Surco</p>

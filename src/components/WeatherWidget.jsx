@@ -94,27 +94,29 @@ function WeatherWidget() {
       }
       setLoading(true)
       setError('')
-      const params = new URLSearchParams({
-        latitude: coords.lat,
-        longitude: coords.lng,
-        current: 'temperature_2m,wind_speed_10m,precipitation,weather_code',
-        hourly:
-          'temperature_2m,precipitation,precipitation_probability,weather_code',
-        timezone: 'auto',
-      })
-      const response = await fetch(`${WEATHER_ENDPOINT}?${params}`)
-      if (!response.ok) {
-        throw new Error('Weather request failed')
+      try {
+        const params = new URLSearchParams({
+          latitude: coords.lat,
+          longitude: coords.lng,
+          current: 'temperature_2m,wind_speed_10m,precipitation,weather_code',
+          hourly:
+            'temperature_2m,precipitation,precipitation_probability,weather_code',
+          timezone: 'auto',
+        })
+        const response = await fetch(`${WEATHER_ENDPOINT}?${params}`)
+        if (!response.ok) {
+          throw new Error('Weather request failed')
+        }
+        const data = await response.json()
+        setWeather(data)
+        setLoading(false)
+      } catch (err) {
+        setError('No se pudo obtener el clima.')
+        setLoading(false)
       }
-      const data = await response.json()
-      setWeather(data)
-      setLoading(false)
     }
 
-    fetchWeather().catch(() => {
-      setError('No se pudo obtener el clima.')
-      setLoading(false)
-    })
+    fetchWeather()
   }, [coords])
 
   useEffect(() => {
@@ -172,7 +174,7 @@ function WeatherWidget() {
         <p className="weather-title">Clima en campos</p>
         {current ? (
           <p className="weather-value">
-            {current.temp} C / {current.wind} km/h
+            {current.temp}°C / {current.wind} km/h
           </p>
         ) : (
           <p className="weather-value">Sin datos</p>
