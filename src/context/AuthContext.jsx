@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
-  signInWithPopup,
+  getRedirectResult,
+  signInWithRedirect,
   signOut,
 } from 'firebase/auth'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
@@ -15,6 +16,9 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    getRedirectResult(auth).catch(() => {
+      // Ignorar si no hay redirect pendiente.
+    })
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser)
       setLoading(false)
@@ -42,7 +46,7 @@ export function AuthProvider({ children }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
-    return signInWithPopup(auth, provider)
+    return signInWithRedirect(auth, provider)
   }
 
   const logout = () => signOut(auth)
