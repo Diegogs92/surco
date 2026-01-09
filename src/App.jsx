@@ -7,8 +7,10 @@ import Campos from './pages/Campos.jsx'
 import Cultivos from './pages/Cultivos.jsx'
 import Tareas from './pages/Tareas.jsx'
 import Maquinaria from './pages/Maquinaria.jsx'
+import Reportes from './pages/Reportes.jsx'
 import Personal from './pages/Personal.jsx'
 import Insumos from './pages/Insumos.jsx'
+import Proveedores from './pages/Proveedores.jsx'
 import Costos from './pages/Costos.jsx'
 import NotFound from './pages/NotFound.jsx'
 import BackgroundVideo from './components/BackgroundVideo.jsx'
@@ -27,8 +29,10 @@ function App() {
             <Route path="/cultivos" element={<Cultivos />} />
             <Route path="/tareas" element={<Tareas />} />
             <Route path="/maquinaria" element={<Maquinaria />} />
+            <Route path="/reportes" element={<Reportes />} />
             <Route path="/personal" element={<Personal />} />
             <Route path="/insumos" element={<Insumos />} />
+            <Route path="/proveedores" element={<Proveedores />} />
             <Route path="/costos" element={<Costos />} />
           </Route>
         </Route>

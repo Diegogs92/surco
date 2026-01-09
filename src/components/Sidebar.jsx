@@ -6,8 +6,10 @@ const navItems = [
   { to: '/cultivos', label: 'Cultivos' },
   { to: '/tareas', label: 'Tareas' },
   { to: '/maquinaria', label: 'Maquinaria' },
+  { to: '/reportes', label: 'Reportes' },
   { to: '/personal', label: 'Personal' },
   { to: '/insumos', label: 'Insumos' },
+  { to: '/proveedores', label: 'Proveedores' },
   { to: '/costos', label: 'Costos' },
 ]
 

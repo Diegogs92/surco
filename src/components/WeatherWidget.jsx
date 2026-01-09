@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../firebase.js'
 
-const WEATHER_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
 const WEATHER_TIMEOUT_MS = 8000
 
 function WeatherWidget() {
@@ -99,15 +98,10 @@ function WeatherWidget() {
       const timeoutId = setTimeout(() => controller.abort(), WEATHER_TIMEOUT_MS)
       try {
         const params = new URLSearchParams({
-          latitude: coords.lat.toFixed(4),
-          longitude: coords.lng.toFixed(4),
-          current: 'temperature_2m,wind_speed_10m,precipitation,weather_code',
-          hourly:
-            'temperature_2m,precipitation,precipitation_probability,weather_code',
-          timezone: 'auto',
-          forecast_days: '1',
+          lat: coords.lat.toFixed(4),
+          lng: coords.lng.toFixed(4),
         })
-        const response = await fetch(`${WEATHER_ENDPOINT}?${params}`, {
+        const response = await fetch(`/api/weather?${params}`, {
           method: 'GET',
           signal: controller.signal,
           cache: 'no-store',
@@ -128,9 +122,7 @@ function WeatherWidget() {
         setWeather(data)
         setLoading(false)
       } catch (err) {
-        setError(
-          'No se pudo obtener el clima. Verifica acceso a api.open-meteo.com.',
-        )
+        setError('No se pudo obtener el clima.')
         setLoading(false)
       } finally {
         clearTimeout(timeoutId)

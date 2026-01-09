@@ -101,7 +101,7 @@ function Cultivos() {
     <div className="page">
       <PageHeader
         title="Cultivos"
-        subtitle="Gestiona campañas, variedades y rendimiento."
+        subtitle="Gestiona campañas y fechas de siembra/cosecha."
       />
       <section className="two-column">
         <div className="card">
@@ -152,7 +152,7 @@ function Cultivos() {
               className="input"
               type="number"
               name="rendimientoEsperado"
-              placeholder="Rendimiento esperado"
+              placeholder="Rendimiento esperado (t/ha)"
               value={form.rendimientoEsperado}
               onChange={handleChange}
             />
@@ -160,7 +160,7 @@ function Cultivos() {
               className="input"
               type="number"
               name="rendimientoReal"
-              placeholder="Rendimiento real"
+              placeholder="Rendimiento real (t/ha)"
               value={form.rendimientoReal}
               onChange={handleChange}
             />
@@ -184,11 +184,11 @@ function Cultivos() {
                   </div>
                   <div>
                     <span>Siembra: {cultivo.fechaSiembra || 'Sin fecha'}</span>
-                    <span>Cosecha: {cultivo.fechaCosecha || 'Sin fecha'}</span>
+                    <span>Cosecha estimada: {cultivo.fechaCosecha || 'Sin fecha'}</span>
                   </div>
                   <div>
-                    <span>Esperado: {cultivo.rendimientoEsperado}</span>
-                    <span>Real: {cultivo.rendimientoReal}</span>
+                    <span>Esperado: {cultivo.rendimientoEsperado} t/ha</span>
+                    <span>Real: {cultivo.rendimientoReal} t/ha</span>
                   </div>
                   <div className="row-actions">
                     <button
@@ -278,7 +278,7 @@ function Cultivos() {
             className="input"
             type="number"
             name="rendimientoEsperado"
-            placeholder="Rendimiento esperado"
+            placeholder="Rendimiento esperado (t/ha)"
             value={editForm?.rendimientoEsperado || ''}
             onChange={handleEditChange}
           />
@@ -286,7 +286,7 @@ function Cultivos() {
             className="input"
             type="number"
             name="rendimientoReal"
-            placeholder="Rendimiento real"
+            placeholder="Rendimiento real (t/ha)"
             value={editForm?.rendimientoReal || ''}
             onChange={handleEditChange}
           />

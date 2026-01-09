@@ -18,7 +18,7 @@ const initialForm = {
   categoria: 'Semillas',
   nombre: '',
   stock: '',
-  consumoPorTarea: '',
+  unidad: 'kg',
   costoUnitario: '',
   proveedor: '',
 }
@@ -29,6 +29,7 @@ function Insumos() {
   const [editInsumo, setEditInsumo] = useState(null)
   const [editForm, setEditForm] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [proveedores, setProveedores] = useState([])
 
   useEffect(() => {
     const q = query(collection(db, 'insumos'), orderBy('createdAt', 'desc'))
@@ -42,6 +43,17 @@ function Insumos() {
     return () => unsub()
   }, [])
 
+  useEffect(() => {
+    const unsubProv = onSnapshot(collection(db, 'proveedores'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setProveedores(data)
+    })
+    return () => unsubProv()
+  }, [])
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -53,7 +65,6 @@ function Insumos() {
     await addDoc(collection(db, 'insumos'), {
       ...form,
       stock: Number(form.stock || 0),
-      consumoPorTarea: Number(form.consumoPorTarea || 0),
       costoUnitario: Number(form.costoUnitario || 0),
       createdAt: serverTimestamp(),
     })
@@ -66,7 +77,7 @@ function Insumos() {
       categoria: insumo.categoria || 'Semillas',
       nombre: insumo.nombre || '',
       stock: insumo.stock || '',
-      consumoPorTarea: insumo.consumoPorTarea || '',
+      unidad: insumo.unidad || 'kg',
       costoUnitario: insumo.costoUnitario || '',
       proveedor: insumo.proveedor || '',
     })
@@ -84,7 +95,6 @@ function Insumos() {
     await updateDoc(doc(db, 'insumos', editInsumo.id), {
       ...editForm,
       stock: Number(editForm.stock || 0),
-      consumoPorTarea: Number(editForm.consumoPorTarea || 0),
       costoUnitario: Number(editForm.costoUnitario || 0),
     })
     setSavingEdit(false)
@@ -134,29 +144,38 @@ function Insumos() {
               value={form.stock}
               onChange={handleChange}
             />
-            <input
+            <select
               className="input"
-              type="number"
-              name="consumoPorTarea"
-              placeholder="Consumo por tarea"
-              value={form.consumoPorTarea}
+              name="unidad"
+              value={form.unidad}
               onChange={handleChange}
-            />
+            >
+              <option value="kg">kg</option>
+              <option value="l">l</option>
+              <option value="bolsa">bolsa</option>
+              <option value="unidad">unidad</option>
+            </select>
             <input
               className="input"
               type="number"
               name="costoUnitario"
-              placeholder="Costo unitario"
+              placeholder="Costo unitario ($)"
               value={form.costoUnitario}
               onChange={handleChange}
             />
-            <input
+            <select
               className="input"
               name="proveedor"
-              placeholder="Proveedor"
               value={form.proveedor}
               onChange={handleChange}
-            />
+            >
+              <option value="">Proveedor</option>
+              {proveedores.map((proveedor) => (
+                <option key={proveedor.id} value={proveedor.nombre}>
+                  {proveedor.nombre}
+                </option>
+              ))}
+            </select>
             <button className="primary-button" type="submit">
               Guardar insumo
             </button>
@@ -176,11 +195,12 @@ function Insumos() {
                     <span>{insumo.categoria}</span>
                   </div>
                   <div>
-                    <span>Stock: {insumo.stock}</span>
-                    <span>Consumo: {insumo.consumoPorTarea}</span>
+                    <span>
+                      Stock: {insumo.stock} {insumo.unidad || ''}
+                    </span>
                   </div>
                   <div>
-                    <span>Costo: {insumo.costoUnitario}</span>
+                    <span>Costo: ${insumo.costoUnitario}</span>
                     <span>{insumo.proveedor || 'Sin proveedor'}</span>
                   </div>
                   <div className="row-actions">
@@ -253,29 +273,38 @@ function Insumos() {
             value={editForm?.stock || ''}
             onChange={handleEditChange}
           />
-          <input
+          <select
             className="input"
-            type="number"
-            name="consumoPorTarea"
-            placeholder="Consumo por tarea"
-            value={editForm?.consumoPorTarea || ''}
+            name="unidad"
+            value={editForm?.unidad || 'kg'}
             onChange={handleEditChange}
-          />
+          >
+            <option value="kg">kg</option>
+            <option value="l">l</option>
+            <option value="bolsa">bolsa</option>
+            <option value="unidad">unidad</option>
+          </select>
           <input
             className="input"
             type="number"
             name="costoUnitario"
-            placeholder="Costo unitario"
+            placeholder="Costo unitario ($)"
             value={editForm?.costoUnitario || ''}
             onChange={handleEditChange}
           />
-          <input
+          <select
             className="input"
             name="proveedor"
-            placeholder="Proveedor"
             value={editForm?.proveedor || ''}
             onChange={handleEditChange}
-          />
+          >
+            <option value="">Proveedor</option>
+            {proveedores.map((proveedor) => (
+              <option key={proveedor.id} value={proveedor.nombre}>
+                {proveedor.nombre}
+              </option>
+            ))}
+          </select>
         </form>
       </Modal>
     </div>

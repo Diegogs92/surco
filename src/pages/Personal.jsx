@@ -18,9 +18,6 @@ const initialForm = {
   nombre: '',
   rol: 'Operario',
   camposAsignados: '',
-  horas: '',
-  costoLaboral: '',
-  asistencia: 'Al dia',
 }
 
 function Personal() {
@@ -30,6 +27,7 @@ function Personal() {
   const [editEmpleado, setEditEmpleado] = useState(null)
   const [editForm, setEditForm] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [campos, setCampos] = useState([])
 
   useEffect(() => {
     const q = query(collection(db, 'empleados'), orderBy('nombre', 'asc'))
@@ -41,6 +39,17 @@ function Personal() {
       setEmpleados(data)
     })
     return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const unsubCampos = onSnapshot(collection(db, 'campos'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setCampos(data)
+    })
+    return () => unsubCampos()
   }, [])
 
   useEffect(() => {
@@ -65,8 +74,6 @@ function Personal() {
     if (!form.nombre) return
     await addDoc(collection(db, 'empleados'), {
       ...form,
-      horas: Number(form.horas || 0),
-      costoLaboral: Number(form.costoLaboral || 0),
       createdAt: serverTimestamp(),
     })
     setForm(initialForm)
@@ -82,9 +89,6 @@ function Personal() {
       nombre: empleado.nombre || '',
       rol: empleado.rol || 'Operario',
       camposAsignados: empleado.camposAsignados || '',
-      horas: empleado.horas || '',
-      costoLaboral: empleado.costoLaboral || '',
-      asistencia: empleado.asistencia || 'Al dia',
     })
   }
 
@@ -99,8 +103,6 @@ function Personal() {
     setSavingEdit(true)
     await updateDoc(doc(db, 'empleados', editEmpleado.id), {
       ...editForm,
-      horas: Number(editForm.horas || 0),
-      costoLaboral: Number(editForm.costoLaboral || 0),
     })
     setSavingEdit(false)
     setEditEmpleado(null)
@@ -141,38 +143,25 @@ function Personal() {
               <option>Supervisor</option>
               <option>Administrativo</option>
             </select>
-            <input
-              className="input"
-              name="camposAsignados"
-              placeholder="Campos asignados"
-              value={form.camposAsignados}
-              onChange={handleChange}
-            />
-            <input
-              className="input"
-              type="number"
-              name="horas"
-              placeholder="Jornales / horas"
-              value={form.horas}
-              onChange={handleChange}
-            />
-            <input
-              className="input"
-              type="number"
-              name="costoLaboral"
-              placeholder="Costo laboral"
-              value={form.costoLaboral}
-              onChange={handleChange}
-            />
             <select
               className="input"
-              name="asistencia"
-              value={form.asistencia}
-              onChange={handleChange}
+              name="camposAsignados"
+              multiple
+              value={form.camposAsignados ? form.camposAsignados.split(',') : []}
+              onChange={(event) =>
+                setForm((prev) => ({
+                  ...prev,
+                  camposAsignados: Array.from(event.target.selectedOptions)
+                    .map((option) => option.value)
+                    .join(','),
+                }))
+              }
             >
-              <option>Al dia</option>
-              <option>Ausente</option>
-              <option>Licencia</option>
+              {campos.map((campo) => (
+                <option key={campo.id} value={campo.nombre}>
+                  {campo.nombre}
+                </option>
+              ))}
             </select>
             <button className="primary-button" type="submit">
               Guardar empleado
@@ -193,12 +182,9 @@ function Personal() {
                     <span>{empleado.rol}</span>
                   </div>
                   <div>
-                    <span>{empleado.camposAsignados || 'Sin campos'}</span>
-                    <span>Horas: {empleado.horas || 0}</span>
-                  </div>
-                  <div>
-                    <span>Asistencia: {empleado.asistencia}</span>
-                    <span>Costo: {empleado.costoLaboral || 0}</span>
+                    <span>
+                      {empleado.camposAsignados || 'Sin campos asignados'}
+                    </span>
                   </div>
                   <div className="row-actions">
                     <button
@@ -301,38 +287,29 @@ function Personal() {
             <option>Supervisor</option>
             <option>Administrativo</option>
           </select>
-          <input
-            className="input"
-            name="camposAsignados"
-            placeholder="Campos asignados"
-            value={editForm?.camposAsignados || ''}
-            onChange={handleEditChange}
-          />
-          <input
-            className="input"
-            type="number"
-            name="horas"
-            placeholder="Jornales / horas"
-            value={editForm?.horas || ''}
-            onChange={handleEditChange}
-          />
-          <input
-            className="input"
-            type="number"
-            name="costoLaboral"
-            placeholder="Costo laboral"
-            value={editForm?.costoLaboral || ''}
-            onChange={handleEditChange}
-          />
           <select
             className="input"
-            name="asistencia"
-            value={editForm?.asistencia || 'Al dia'}
-            onChange={handleEditChange}
+            name="camposAsignados"
+            multiple
+            value={
+              editForm?.camposAsignados
+                ? editForm.camposAsignados.split(',')
+                : []
+            }
+            onChange={(event) =>
+              setEditForm((prev) => ({
+                ...prev,
+                camposAsignados: Array.from(event.target.selectedOptions)
+                  .map((option) => option.value)
+                  .join(','),
+              }))
+            }
           >
-            <option>Al dia</option>
-            <option>Ausente</option>
-            <option>Licencia</option>
+            {campos.map((campo) => (
+              <option key={campo.id} value={campo.nombre}>
+                {campo.nombre}
+              </option>
+            ))}
           </select>
         </form>
       </Modal>

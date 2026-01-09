@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   addDoc,
   collection,
@@ -12,26 +12,28 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
-import StatCard from '../components/StatCard.jsx'
 import Modal from '../components/Modal.jsx'
 import { uploadFiles } from '../utils/uploadFiles.js'
 
 const initialForm = {
-  maquinaria: '',
-  tipo: '',
-  estado: 'Operativa',
+  maquinariaId: '',
+  maquinariaNombre: '',
+  fecha: '',
+  descripcion: '',
+  estado: 'Pendiente',
+  personal: '',
 }
 
-function Maquinaria() {
-  const [equipos, setEquipos] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+function Reportes() {
+  const [reportes, setReportes] = useState([])
+  const [maquinarias, setMaquinarias] = useState([])
+  const [empleados, setEmpleados] = useState([])
   const [form, setForm] = useState(initialForm)
   const [photos, setPhotos] = useState([])
   const [photoPreviews, setPhotoPreviews] = useState([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [editEquipo, setEditEquipo] = useState(null)
+  const [editReporte, setEditReporte] = useState(null)
   const [editForm, setEditForm] = useState(null)
   const [editPhotos, setEditPhotos] = useState([])
   const [editPreviews, setEditPreviews] = useState([])
@@ -39,16 +41,36 @@ function Maquinaria() {
   const [editError, setEditError] = useState('')
 
   useEffect(() => {
-    const q = query(collection(db, 'maquinaria'), orderBy('createdAt', 'desc'))
+    const q = query(collection(db, 'reportes'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data(),
       }))
-      setEquipos(data)
-      setLoading(false)
+      setReportes(data)
     })
     return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const unsubMaquinaria = onSnapshot(collection(db, 'maquinaria'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setMaquinarias(data)
+    })
+    const unsubEmpleados = onSnapshot(collection(db, 'empleados'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setEmpleados(data)
+    })
+    return () => {
+      unsubMaquinaria()
+      unsubEmpleados()
+    }
   }, [])
 
   useEffect(() => {
@@ -61,25 +83,17 @@ function Maquinaria() {
     return () => previews.forEach((url) => URL.revokeObjectURL(url))
   }, [photos])
 
-  const stats = useMemo(() => {
-    const total = equipos.length
-    const operativas = equipos.filter((e) => e.estado === 'Operativa').length
-    const fuera = equipos.filter((e) => e.estado === 'Fuera de servicio').length
-    return { total, operativas, fuera }
-  }, [equipos])
-
-  const filtered = useMemo(() => {
-    if (!search.trim()) return equipos
-    const term = search.toLowerCase()
-    return equipos.filter((equipo) =>
-      [equipo.maquinaria, equipo.tipo]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(term)),
-    )
-  }, [equipos, search])
-
   const handleChange = (event) => {
     const { name, value } = event.target
+    if (name === 'maquinariaId') {
+      const selected = maquinarias.find((item) => item.id === value)
+      setForm((prev) => ({
+        ...prev,
+        maquinariaId: value,
+        maquinariaNombre: selected?.maquinaria || '',
+      }))
+      return
+    }
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -90,20 +104,20 @@ function Maquinaria() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (!form.maquinaria) return
+    if (!form.maquinariaId || !form.fecha || !form.descripcion) return
     setSaving(true)
     setError('')
     let photoUrls = []
     let photoStatus = 'ok'
     if (photos.length) {
       try {
-        photoUrls = await uploadFiles(photos, 'maquinaria')
+        photoUrls = await uploadFiles(photos, 'reportes')
       } catch {
         photoStatus = 'pendiente'
-        setError('No se pudieron subir las fotos de la maquinaria.')
+        setError('No se pudieron subir las fotos.')
       }
     }
-    await addDoc(collection(db, 'maquinaria'), {
+    await addDoc(collection(db, 'reportes'), {
       ...form,
       fotos: photoUrls,
       fotosEstado: photoStatus,
@@ -124,12 +138,15 @@ function Maquinaria() {
     return () => previews.forEach((url) => URL.revokeObjectURL(url))
   }, [editPhotos])
 
-  const openEdit = (equipo) => {
-    setEditEquipo(equipo)
+  const openEdit = (reporte) => {
+    setEditReporte(reporte)
     setEditForm({
-      maquinaria: equipo.maquinaria || '',
-      tipo: equipo.tipo || '',
-      estado: equipo.estado || 'Operativa',
+      maquinariaId: reporte.maquinariaId || '',
+      maquinariaNombre: reporte.maquinariaNombre || '',
+      fecha: reporte.fecha || '',
+      descripcion: reporte.descripcion || '',
+      estado: reporte.estado || 'Pendiente',
+      personal: reporte.personal || '',
     })
     setEditPhotos([])
     setEditError('')
@@ -137,6 +154,15 @@ function Maquinaria() {
 
   const handleEditChange = (event) => {
     const { name, value } = event.target
+    if (name === 'maquinariaId') {
+      const selected = maquinarias.find((item) => item.id === value)
+      setEditForm((prev) => ({
+        ...prev,
+        maquinariaId: value,
+        maquinariaNombre: selected?.maquinaria || '',
+      }))
+      return
+    }
     setEditForm((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -147,14 +173,14 @@ function Maquinaria() {
 
   const handleEditSubmit = async (event) => {
     event.preventDefault()
-    if (!editEquipo) return
+    if (!editReporte) return
     setSavingEdit(true)
     setEditError('')
-    let photoUrls = editEquipo.fotos || []
-    let photoStatus = editEquipo.fotosEstado || 'ok'
+    let photoUrls = editReporte.fotos || []
+    let photoStatus = editReporte.fotosEstado || 'ok'
     if (editPhotos.length) {
       try {
-        const uploaded = await uploadFiles(editPhotos, 'maquinaria')
+        const uploaded = await uploadFiles(editPhotos, 'reportes')
         photoUrls = [...photoUrls, ...uploaded]
         photoStatus = 'ok'
       } catch {
@@ -162,62 +188,52 @@ function Maquinaria() {
         setEditError('No se pudieron subir las fotos nuevas.')
       }
     }
-    await updateDoc(doc(db, 'maquinaria', editEquipo.id), {
+    await updateDoc(doc(db, 'reportes', editReporte.id), {
       ...editForm,
       fotos: photoUrls,
       fotosEstado: photoStatus,
     })
     setSavingEdit(false)
-    setEditEquipo(null)
+    setEditReporte(null)
   }
 
-  const handleDelete = async (equipo) => {
-    const confirmDelete = window.confirm(
-      `Eliminar ${equipo.maquinaria || 'maquinaria'}?`,
-    )
+  const handleDelete = async (reporte) => {
+    const confirmDelete = window.confirm('Eliminar reporte?')
     if (!confirmDelete) return
-    await deleteDoc(doc(db, 'maquinaria', equipo.id))
+    await deleteDoc(doc(db, 'reportes', reporte.id))
   }
 
   return (
     <div className="page">
       <PageHeader
-        title="Maquinaria"
-        subtitle="Catalogo de maquinaria y estado operativo."
-        actions={
-          <input
-            className="input"
-            placeholder="Buscar maquinaria..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-        }
+        title="Reportes"
+        subtitle="Reportes de maquinaria con fotos y responsables."
       />
-
-      <section className="stats-grid">
-        <StatCard label="Total" value={stats.total} hint="Unidades" />
-        <StatCard label="Operativas" value={stats.operativas} hint="Listas hoy" />
-        <StatCard label="Fuera de servicio" value={stats.fuera} hint="En pausa" />
-      </section>
-
       <section className="two-column">
         <div className="card">
-          <h2>Nueva maquinaria</h2>
+          <h2>Nuevo reporte</h2>
           <form className="form-grid" onSubmit={handleSubmit}>
-            <input
+            <select
               className="input"
-              name="maquinaria"
-              placeholder="Maquinaria"
-              value={form.maquinaria}
+              name="maquinariaId"
+              value={form.maquinariaId}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Maquinaria</option>
+              {maquinarias.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.maquinaria}
+                </option>
+              ))}
+            </select>
             <input
               className="input"
-              name="tipo"
-              placeholder="Tipo"
-              value={form.tipo}
+              type="date"
+              name="fecha"
+              value={form.fecha}
               onChange={handleChange}
+              required
             />
             <select
               className="input"
@@ -225,9 +241,31 @@ function Maquinaria() {
               value={form.estado}
               onChange={handleChange}
             >
-              <option>Operativa</option>
-              <option>Fuera de servicio</option>
+              <option>Pendiente</option>
+              <option>En curso</option>
+              <option>Resuelto</option>
             </select>
+            <select
+              className="input"
+              name="personal"
+              value={form.personal}
+              onChange={handleChange}
+            >
+              <option value="">Personal interviniente</option>
+              {empleados.map((empleado) => (
+                <option key={empleado.id} value={empleado.nombre}>
+                  {empleado.nombre}
+                </option>
+              ))}
+            </select>
+            <textarea
+              className="input textarea"
+              name="descripcion"
+              placeholder="Descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              required
+            />
             <label className="file-input">
               <span>Fotos</span>
               <input
@@ -246,53 +284,46 @@ function Maquinaria() {
             )}
             {error && <p className="form-error">{error}</p>}
             <button className="primary-button" type="submit" disabled={saving}>
-              {saving ? 'Guardando...' : 'Guardar maquinaria'}
+              {saving ? 'Guardando...' : 'Guardar reporte'}
             </button>
           </form>
         </div>
 
         <div className="card">
-          <h2>Maquinaria registrada</h2>
-          {loading ? (
-            <div className="empty-state">Cargando maquinaria...</div>
-          ) : filtered.length === 0 ? (
-            <div className="empty-state">No hay maquinaria registrada.</div>
+          <h2>Reportes registrados</h2>
+          {reportes.length === 0 ? (
+            <div className="empty-state">No hay reportes cargados.</div>
           ) : (
             <div className="table">
-              {filtered.map((equipo) => (
-                <div className="table-row with-thumb" key={equipo.id}>
+              {reportes.map((reporte) => (
+                <div className="table-row with-thumb" key={reporte.id}>
                   <div className="thumb">
-                    {equipo.fotos?.[0] ? (
-                      <img src={equipo.fotos[0]} alt={equipo.maquinaria} />
+                    {reporte.fotos?.[0] ? (
+                      <img src={reporte.fotos[0]} alt="Reporte" />
                     ) : (
                       <span>Sin foto</span>
                     )}
                   </div>
                   <div>
-                    <strong>{equipo.maquinaria}</strong>
-                    <span>{equipo.tipo || 'Sin tipo'}</span>
+                    <strong>{reporte.maquinariaNombre}</strong>
+                    <span>{reporte.fecha}</span>
                   </div>
                   <div>
-                    <span
-                      className={`badge status-${(equipo.estado || '')
-                        .toLowerCase()
-                        .replace(/\s+/g, '-')}`}
-                    >
-                      {equipo.estado}
-                    </span>
+                    <span>{reporte.estado}</span>
+                    <span>{reporte.personal || 'Sin personal'}</span>
                   </div>
                   <div className="row-actions">
                     <button
                       className="icon-button"
                       type="button"
-                      onClick={() => openEdit(equipo)}
+                      onClick={() => openEdit(reporte)}
                     >
                       Editar
                     </button>
                     <button
                       className="icon-button danger"
                       type="button"
-                      onClick={() => handleDelete(equipo)}
+                      onClick={() => handleDelete(reporte)}
                     >
                       Eliminar
                     </button>
@@ -305,49 +336,74 @@ function Maquinaria() {
       </section>
 
       <Modal
-        open={Boolean(editEquipo)}
-        title="Editar maquinaria"
-        onClose={() => setEditEquipo(null)}
+        open={Boolean(editReporte)}
+        title="Editar reporte"
+        onClose={() => setEditReporte(null)}
         actions={
           <button
             className="primary-button"
             type="submit"
-            form="edit-maquinaria-form"
+            form="edit-reporte-form"
             disabled={savingEdit}
           >
             {savingEdit ? 'Guardando...' : 'Guardar cambios'}
           </button>
         }
       >
-        <form
-          className="form-grid"
-          id="edit-maquinaria-form"
-          onSubmit={handleEditSubmit}
-        >
-          <input
+        <form className="form-grid" id="edit-reporte-form" onSubmit={handleEditSubmit}>
+          <select
             className="input"
-            name="maquinaria"
-            placeholder="Maquinaria"
-            value={editForm?.maquinaria || ''}
+            name="maquinariaId"
+            value={editForm?.maquinariaId || ''}
             onChange={handleEditChange}
             required
-          />
+          >
+            <option value="">Maquinaria</option>
+            {maquinarias.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.maquinaria}
+              </option>
+            ))}
+          </select>
           <input
             className="input"
-            name="tipo"
-            placeholder="Tipo"
-            value={editForm?.tipo || ''}
+            type="date"
+            name="fecha"
+            value={editForm?.fecha || ''}
             onChange={handleEditChange}
+            required
           />
           <select
             className="input"
             name="estado"
-            value={editForm?.estado || 'Operativa'}
+            value={editForm?.estado || 'Pendiente'}
             onChange={handleEditChange}
           >
-            <option>Operativa</option>
-            <option>Fuera de servicio</option>
+            <option>Pendiente</option>
+            <option>En curso</option>
+            <option>Resuelto</option>
           </select>
+          <select
+            className="input"
+            name="personal"
+            value={editForm?.personal || ''}
+            onChange={handleEditChange}
+          >
+            <option value="">Personal interviniente</option>
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombre}>
+                {empleado.nombre}
+              </option>
+            ))}
+          </select>
+          <textarea
+            className="input textarea"
+            name="descripcion"
+            placeholder="Descripcion"
+            value={editForm?.descripcion || ''}
+            onChange={handleEditChange}
+            required
+          />
           <label className="file-input">
             <span>Agregar fotos</span>
             <input
@@ -371,4 +427,4 @@ function Maquinaria() {
   )
 }
 
-export default Maquinaria
+export default Reportes

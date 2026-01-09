@@ -23,6 +23,8 @@ const initialForm = {
 function Costos() {
   const [costos, setCostos] = useState([])
   const [form, setForm] = useState(initialForm)
+  const [campos, setCampos] = useState([])
+  const [cultivos, setCultivos] = useState([])
 
   useEffect(() => {
     const q = query(collection(db, 'costos'), orderBy('createdAt', 'desc'))
@@ -34,6 +36,27 @@ function Costos() {
       setCostos(data)
     })
     return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const unsubCampos = onSnapshot(collection(db, 'campos'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setCampos(data)
+    })
+    const unsubCultivos = onSnapshot(collection(db, 'cultivos'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setCultivos(data)
+    })
+    return () => {
+      unsubCampos()
+      unsubCultivos()
+    }
   }, [])
 
   const handleChange = (event) => {
@@ -64,14 +87,20 @@ function Costos() {
         <div className="card">
           <h2>Nuevo registro</h2>
           <form className="form-grid" onSubmit={handleSubmit}>
-            <input
+            <select
               className="input"
               name="campo"
-              placeholder="Campo"
               value={form.campo}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Campo</option>
+              {campos.map((campo) => (
+                <option key={campo.id} value={campo.nombre}>
+                  {campo.nombre}
+                </option>
+              ))}
+            </select>
             <input
               className="input"
               name="lote"
@@ -79,14 +108,20 @@ function Costos() {
               value={form.lote}
               onChange={handleChange}
             />
-            <input
+            <select
               className="input"
               name="cultivo"
-              placeholder="Cultivo"
               value={form.cultivo}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Cultivo</option>
+              {cultivos.map((cultivo) => (
+                <option key={cultivo.id} value={cultivo.cultivo}>
+                  {cultivo.cultivo} {cultivo.campana ? `(${cultivo.campana})` : ''}
+                </option>
+              ))}
+            </select>
             <input
               className="input"
               name="campana"
@@ -98,7 +133,7 @@ function Costos() {
               className="input"
               type="number"
               name="ingresosCosecha"
-              placeholder="Ingresos por cosecha"
+              placeholder="Ingresos por cosecha ($)"
               value={form.ingresosCosecha}
               onChange={handleChange}
             />
@@ -106,7 +141,7 @@ function Costos() {
               className="input"
               type="number"
               name="margenBruto"
-              placeholder="Margen bruto"
+              placeholder="Margen bruto (%)"
               value={form.margenBruto}
               onChange={handleChange}
             />
@@ -114,7 +149,7 @@ function Costos() {
               className="input"
               type="number"
               name="rentabilidadHa"
-              placeholder="Rentabilidad por ha"
+              placeholder="Rentabilidad (%)"
               value={form.rentabilidadHa}
               onChange={handleChange}
             />
@@ -138,11 +173,11 @@ function Costos() {
                   </div>
                   <div>
                     <span>Campaña: {costo.campana || 'Sin campaña'}</span>
-                    <span>Ingresos: {costo.ingresosCosecha}</span>
+                    <span>Ingresos: ${costo.ingresosCosecha}</span>
                   </div>
                   <div>
-                    <span>Margen: {costo.margenBruto}</span>
-                    <span>Rentabilidad: {costo.rentabilidadHa}</span>
+                    <span>Margen: {costo.margenBruto}%</span>
+                    <span>Rentabilidad: {costo.rentabilidadHa}%</span>
                   </div>
                 </div>
               ))}

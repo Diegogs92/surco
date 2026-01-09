@@ -32,6 +32,9 @@ function Tareas() {
   const [editTarea, setEditTarea] = useState(null)
   const [editForm, setEditForm] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [campos, setCampos] = useState([])
+  const [empleados, setEmpleados] = useState([])
+  const [insumos, setInsumos] = useState([])
 
   useEffect(() => {
     const q = query(collection(db, 'tareas'), orderBy('createdAt', 'desc'))
@@ -43,6 +46,35 @@ function Tareas() {
       setTareas(data)
     })
     return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const unsubCampos = onSnapshot(collection(db, 'campos'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setCampos(data)
+    })
+    const unsubEmpleados = onSnapshot(collection(db, 'empleados'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setEmpleados(data)
+    })
+    const unsubInsumos = onSnapshot(collection(db, 'insumos'), (snapshot) => {
+      const data = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      setInsumos(data)
+    })
+    return () => {
+      unsubCampos()
+      unsubEmpleados()
+      unsubInsumos()
+    }
   }, [])
 
   const handleChange = (event) => {
@@ -132,14 +164,20 @@ function Tareas() {
               onChange={handleChange}
               required
             />
-            <input
-              className="input"
-              name="campo"
-              placeholder="Campo"
-              value={form.campo}
-              onChange={handleChange}
-              required
-            />
+          <select
+            className="input"
+            name="campo"
+            value={form.campo}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Campo</option>
+            {campos.map((campo) => (
+              <option key={campo.id} value={campo.nombre}>
+                {campo.nombre}
+              </option>
+            ))}
+          </select>
             <input
               className="input"
               name="lote"
@@ -147,13 +185,19 @@ function Tareas() {
               value={form.lote}
               onChange={handleChange}
             />
-            <input
-              className="input"
-              name="responsable"
-              placeholder="Responsable"
-              value={form.responsable}
-              onChange={handleChange}
-            />
+          <select
+            className="input"
+            name="responsable"
+            value={form.responsable}
+            onChange={handleChange}
+          >
+            <option value="">Responsable</option>
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombre}>
+                {empleado.nombre}
+              </option>
+            ))}
+          </select>
             <select
               className="input"
               name="estado"
@@ -164,29 +208,42 @@ function Tareas() {
               <option>En curso</option>
               <option>Realizada</option>
             </select>
-            <input
-              className="input"
-              name="insumos"
-              placeholder="Insumos usados"
-              value={form.insumos}
-              onChange={handleChange}
-            />
-            <input
-              className="input"
-              type="number"
-              name="costoEstimado"
-              placeholder="Costo estimado"
-              value={form.costoEstimado}
-              onChange={handleChange}
-            />
-            <input
-              className="input"
-              type="number"
-              name="costoReal"
-              placeholder="Costo real"
-              value={form.costoReal}
-              onChange={handleChange}
-            />
+          <select
+            className="input"
+            name="insumos"
+            multiple
+            value={form.insumos ? form.insumos.split(',') : []}
+            onChange={(event) =>
+              setForm((prev) => ({
+                ...prev,
+                insumos: Array.from(event.target.selectedOptions)
+                  .map((option) => option.value)
+                  .join(','),
+              }))
+            }
+          >
+            {insumos.map((insumo) => (
+              <option key={insumo.id} value={insumo.nombre}>
+                {insumo.nombre}
+              </option>
+            ))}
+          </select>
+          <input
+            className="input"
+            type="number"
+            name="costoEstimado"
+            placeholder="Costo estimado ($)"
+            value={form.costoEstimado}
+            onChange={handleChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="costoReal"
+            placeholder="Costo real ($)"
+            value={form.costoReal}
+            onChange={handleChange}
+          />
             <button className="primary-button" type="submit">
               Guardar tarea
             </button>
@@ -214,8 +271,8 @@ function Tareas() {
                     <span>Resp: {tarea.responsable || 'Sin responsable'}</span>
                   </div>
                   <div>
-                    <span>Est: {tarea.costoEstimado}</span>
-                    <span>Real: {tarea.costoReal}</span>
+                    <span>Est: ${tarea.costoEstimado}</span>
+                    <span>Real: ${tarea.costoReal}</span>
                   </div>
                   <div className="row-actions">
                     <button
@@ -277,14 +334,20 @@ function Tareas() {
             onChange={handleEditChange}
             required
           />
-          <input
+          <select
             className="input"
             name="campo"
-            placeholder="Campo"
             value={editForm?.campo || ''}
             onChange={handleEditChange}
             required
-          />
+          >
+            <option value="">Campo</option>
+            {campos.map((campo) => (
+              <option key={campo.id} value={campo.nombre}>
+                {campo.nombre}
+              </option>
+            ))}
+          </select>
           <input
             className="input"
             name="lote"
@@ -292,13 +355,19 @@ function Tareas() {
             value={editForm?.lote || ''}
             onChange={handleEditChange}
           />
-          <input
+          <select
             className="input"
             name="responsable"
-            placeholder="Responsable"
             value={editForm?.responsable || ''}
             onChange={handleEditChange}
-          />
+          >
+            <option value="">Responsable</option>
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombre}>
+                {empleado.nombre}
+              </option>
+            ))}
+          </select>
           <select
             className="input"
             name="estado"
@@ -309,18 +378,31 @@ function Tareas() {
             <option>En curso</option>
             <option>Realizada</option>
           </select>
-          <input
+          <select
             className="input"
             name="insumos"
-            placeholder="Insumos usados"
-            value={editForm?.insumos || ''}
-            onChange={handleEditChange}
-          />
+            multiple
+            value={editForm?.insumos ? editForm.insumos.split(',') : []}
+            onChange={(event) =>
+              setEditForm((prev) => ({
+                ...prev,
+                insumos: Array.from(event.target.selectedOptions)
+                  .map((option) => option.value)
+                  .join(','),
+              }))
+            }
+          >
+            {insumos.map((insumo) => (
+              <option key={insumo.id} value={insumo.nombre}>
+                {insumo.nombre}
+              </option>
+            ))}
+          </select>
           <input
             className="input"
             type="number"
             name="costoEstimado"
-            placeholder="Costo estimado"
+            placeholder="Costo estimado ($)"
             value={editForm?.costoEstimado || ''}
             onChange={handleEditChange}
           />
@@ -328,7 +410,7 @@ function Tareas() {
             className="input"
             type="number"
             name="costoReal"
-            placeholder="Costo real"
+            placeholder="Costo real ($)"
             value={editForm?.costoReal || ''}
             onChange={handleEditChange}
           />

@@ -18,10 +18,9 @@ import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   nombre: '',
+  ubicacion: '',
   superficie: '',
   estado: 'Activo',
-  historial: '',
-  lotes: '',
   lat: '',
   lng: '',
 }
@@ -159,8 +158,6 @@ function Campos() {
       ubicacion: campo.ubicacion || '',
       superficie: campo.superficie || '',
       estado: campo.estado || 'Activo',
-      historial: campo.historial || '',
-      lotes: campo.lotes || '',
       lat: campo.lat ?? '',
       lng: campo.lng ?? '',
     })
@@ -230,7 +227,7 @@ function Campos() {
     <div className="page">
       <PageHeader
         title="Campos"
-        subtitle="Registro de campos, lotes y su historial productivo."
+        subtitle="Registro de campos y ubicaciones."
       />
       <section className="two-column">
         <div className="card">
@@ -243,6 +240,13 @@ function Campos() {
               value={form.nombre}
               onChange={handleChange}
               required
+            />
+            <input
+              className="input"
+              name="ubicacion"
+              placeholder="Ubicacion"
+              value={form.ubicacion}
+              onChange={handleChange}
             />
             <input
               className="input"
@@ -263,20 +267,6 @@ function Campos() {
               <option>En descanso</option>
               <option>Arrendado</option>
             </select>
-            <textarea
-              className="input textarea"
-              name="historial"
-              placeholder="Historial productivo"
-              value={form.historial}
-              onChange={handleChange}
-            />
-            <textarea
-              className="input textarea"
-              name="lotes"
-              placeholder="Subdivision en lotes"
-              value={form.lotes}
-              onChange={handleChange}
-            />
             <div className="map-box">
               {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
                 <div className="empty-state">
@@ -371,6 +361,7 @@ function Campos() {
                     ) : (
                       <span>Sin coordenadas</span>
                     )}
+                    <span>{campo.ubicacion || 'Sin ubicacion'}</span>
                   </div>
                   <div>
                     <span>{campo.superficie} ha</span>
@@ -414,15 +405,22 @@ function Campos() {
           </button>
         }
       >
-        <form className="form-grid" id="edit-campo-form" onSubmit={handleEditSubmit}>
-          <input
-            className="input"
-            name="nombre"
-            placeholder="Nombre"
-            value={editForm?.nombre || ''}
-            onChange={handleEditChange}
-            required
-          />
+          <form className="form-grid" id="edit-campo-form" onSubmit={handleEditSubmit}>
+            <input
+              className="input"
+              name="nombre"
+              placeholder="Nombre"
+              value={editForm?.nombre || ''}
+              onChange={handleEditChange}
+              required
+            />
+            <input
+              className="input"
+              name="ubicacion"
+              placeholder="Ubicacion"
+              value={editForm?.ubicacion || ''}
+              onChange={handleEditChange}
+            />
           <input
             className="input"
             type="number"
@@ -442,20 +440,6 @@ function Campos() {
             <option>En descanso</option>
             <option>Arrendado</option>
           </select>
-          <textarea
-            className="input textarea"
-            name="historial"
-            placeholder="Historial productivo"
-            value={editForm?.historial || ''}
-            onChange={handleEditChange}
-          />
-          <textarea
-            className="input textarea"
-            name="lotes"
-            placeholder="Subdivision en lotes"
-            value={editForm?.lotes || ''}
-            onChange={handleEditChange}
-          />
           <div className="map-box">
             {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
               <div className="empty-state">
