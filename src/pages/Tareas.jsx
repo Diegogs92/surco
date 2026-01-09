@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from 'firebase/firestore'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
+import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   tipo: 'Siembra',
@@ -25,6 +29,9 @@ const initialForm = {
 function Tareas() {
   const [tareas, setTareas] = useState([])
   const [form, setForm] = useState(initialForm)
+  const [editTarea, setEditTarea] = useState(null)
+  const [editForm, setEditForm] = useState(null)
+  const [savingEdit, setSavingEdit] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, 'tareas'), orderBy('createdAt', 'desc'))
@@ -53,6 +60,45 @@ function Tareas() {
       createdAt: serverTimestamp(),
     })
     setForm(initialForm)
+  }
+
+  const openEdit = (tarea) => {
+    setEditTarea(tarea)
+    setEditForm({
+      tipo: tarea.tipo || 'Siembra',
+      fecha: tarea.fecha || '',
+      campo: tarea.campo || '',
+      lote: tarea.lote || '',
+      responsable: tarea.responsable || '',
+      estado: tarea.estado || 'Pendiente',
+      insumos: tarea.insumos || '',
+      costoEstimado: tarea.costoEstimado || '',
+      costoReal: tarea.costoReal || '',
+    })
+  }
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target
+    setEditForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleEditSubmit = async (event) => {
+    event.preventDefault()
+    if (!editTarea) return
+    setSavingEdit(true)
+    await updateDoc(doc(db, 'tareas', editTarea.id), {
+      ...editForm,
+      costoEstimado: Number(editForm.costoEstimado || 0),
+      costoReal: Number(editForm.costoReal || 0),
+    })
+    setSavingEdit(false)
+    setEditTarea(null)
+  }
+
+  const handleDelete = async (tarea) => {
+    const confirmDelete = window.confirm('Eliminar tarea?')
+    if (!confirmDelete) return
+    await deleteDoc(doc(db, 'tareas', tarea.id))
   }
 
   return (
@@ -171,12 +217,123 @@ function Tareas() {
                     <span>Est: {tarea.costoEstimado}</span>
                     <span>Real: {tarea.costoReal}</span>
                   </div>
+                  <div className="row-actions">
+                    <button
+                      className="icon-button"
+                      type="button"
+                      onClick={() => openEdit(tarea)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="icon-button danger"
+                      type="button"
+                      onClick={() => handleDelete(tarea)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       </section>
+
+      <Modal
+        open={Boolean(editTarea)}
+        title="Editar tarea"
+        onClose={() => setEditTarea(null)}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="edit-tarea-form"
+            disabled={savingEdit}
+          >
+            {savingEdit ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        }
+      >
+        <form className="form-grid" id="edit-tarea-form" onSubmit={handleEditSubmit}>
+          <select
+            className="input"
+            name="tipo"
+            value={editForm?.tipo || 'Siembra'}
+            onChange={handleEditChange}
+          >
+            <option>Siembra</option>
+            <option>Fertilizacion</option>
+            <option>Pulverizacion</option>
+            <option>Riego</option>
+            <option>Cosecha</option>
+            <option>Mantenimiento</option>
+          </select>
+          <input
+            className="input"
+            type="date"
+            name="fecha"
+            value={editForm?.fecha || ''}
+            onChange={handleEditChange}
+            required
+          />
+          <input
+            className="input"
+            name="campo"
+            placeholder="Campo"
+            value={editForm?.campo || ''}
+            onChange={handleEditChange}
+            required
+          />
+          <input
+            className="input"
+            name="lote"
+            placeholder="Lote"
+            value={editForm?.lote || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            name="responsable"
+            placeholder="Responsable"
+            value={editForm?.responsable || ''}
+            onChange={handleEditChange}
+          />
+          <select
+            className="input"
+            name="estado"
+            value={editForm?.estado || 'Pendiente'}
+            onChange={handleEditChange}
+          >
+            <option>Pendiente</option>
+            <option>En curso</option>
+            <option>Realizada</option>
+          </select>
+          <input
+            className="input"
+            name="insumos"
+            placeholder="Insumos usados"
+            value={editForm?.insumos || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="costoEstimado"
+            placeholder="Costo estimado"
+            value={editForm?.costoEstimado || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="costoReal"
+            placeholder="Costo real"
+            value={editForm?.costoReal || ''}
+            onChange={handleEditChange}
+          />
+        </form>
+      </Modal>
     </div>
   )
 }

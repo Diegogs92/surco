@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
+import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   nombre: '',
@@ -26,6 +27,9 @@ function Personal() {
   const [empleados, setEmpleados] = useState([])
   const [usuarios, setUsuarios] = useState([])
   const [form, setForm] = useState(initialForm)
+  const [editEmpleado, setEditEmpleado] = useState(null)
+  const [editForm, setEditForm] = useState(null)
+  const [savingEdit, setSavingEdit] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, 'empleados'), orderBy('nombre', 'asc'))
@@ -70,6 +74,36 @@ function Personal() {
 
   const handleRoleChange = async (id, rol) => {
     await updateDoc(doc(db, 'usuarios', id), { rol })
+  }
+
+  const openEdit = (empleado) => {
+    setEditEmpleado(empleado)
+    setEditForm({
+      nombre: empleado.nombre || '',
+      rol: empleado.rol || 'Operario',
+      camposAsignados: empleado.camposAsignados || '',
+      horas: empleado.horas || '',
+      costoLaboral: empleado.costoLaboral || '',
+      asistencia: empleado.asistencia || 'Al dia',
+    })
+  }
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target
+    setEditForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleEditSubmit = async (event) => {
+    event.preventDefault()
+    if (!editEmpleado) return
+    setSavingEdit(true)
+    await updateDoc(doc(db, 'empleados', editEmpleado.id), {
+      ...editForm,
+      horas: Number(editForm.horas || 0),
+      costoLaboral: Number(editForm.costoLaboral || 0),
+    })
+    setSavingEdit(false)
+    setEditEmpleado(null)
   }
 
   const handleDelete = async (id) => {
@@ -168,6 +202,13 @@ function Personal() {
                   </div>
                   <div className="row-actions">
                     <button
+                      className="icon-button"
+                      type="button"
+                      onClick={() => openEdit(empleado)}
+                    >
+                      Editar
+                    </button>
+                    <button
                       className="icon-button danger"
                       type="button"
                       onClick={() => handleDelete(empleado.id)}
@@ -220,6 +261,81 @@ function Personal() {
           </div>
         )}
       </div>
+
+      <Modal
+        open={Boolean(editEmpleado)}
+        title="Editar empleado"
+        onClose={() => setEditEmpleado(null)}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="edit-empleado-form"
+            disabled={savingEdit}
+          >
+            {savingEdit ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        }
+      >
+        <form
+          className="form-grid"
+          id="edit-empleado-form"
+          onSubmit={handleEditSubmit}
+        >
+          <input
+            className="input"
+            name="nombre"
+            placeholder="Nombre"
+            value={editForm?.nombre || ''}
+            onChange={handleEditChange}
+            required
+          />
+          <select
+            className="input"
+            name="rol"
+            value={editForm?.rol || 'Operario'}
+            onChange={handleEditChange}
+          >
+            <option>Operario</option>
+            <option>Mecanico</option>
+            <option>Supervisor</option>
+            <option>Administrativo</option>
+          </select>
+          <input
+            className="input"
+            name="camposAsignados"
+            placeholder="Campos asignados"
+            value={editForm?.camposAsignados || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="horas"
+            placeholder="Jornales / horas"
+            value={editForm?.horas || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="costoLaboral"
+            placeholder="Costo laboral"
+            value={editForm?.costoLaboral || ''}
+            onChange={handleEditChange}
+          />
+          <select
+            className="input"
+            name="asistencia"
+            value={editForm?.asistencia || 'Al dia'}
+            onChange={handleEditChange}
+          >
+            <option>Al dia</option>
+            <option>Ausente</option>
+            <option>Licencia</option>
+          </select>
+        </form>
+      </Modal>
     </div>
   )
 }

@@ -44,7 +44,7 @@ function Login() {
           </div>
           <div>
             <strong>Cultivos</strong>
-            <span>Campanas y rendimiento</span>
+            <span>Campañas y rendimiento</span>
           </div>
           <div>
             <strong>Tareas</strong>

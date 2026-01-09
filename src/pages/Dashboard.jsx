@@ -50,7 +50,7 @@ function Dashboard() {
       />
       <section className="stats-grid">
         <StatCard label="Campos" value={stats.campos} hint="Superficie activa" />
-        <StatCard label="Cultivos" value={stats.cultivos} hint="Campanas" />
+        <StatCard label="Cultivos" value={stats.cultivos} hint="Campañas" />
         <StatCard label="Tareas" value={stats.tareas} hint="Pendientes y en curso" />
         <StatCard
           label="Maquinaria"

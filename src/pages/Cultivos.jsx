@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from 'firebase/firestore'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
+import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   cultivo: 'Soja',
@@ -23,6 +27,9 @@ const initialForm = {
 function Cultivos() {
   const [cultivos, setCultivos] = useState([])
   const [form, setForm] = useState(initialForm)
+  const [editCultivo, setEditCultivo] = useState(null)
+  const [editForm, setEditForm] = useState(null)
+  const [savingEdit, setSavingEdit] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, 'cultivos'), orderBy('createdAt', 'desc'))
@@ -53,11 +60,48 @@ function Cultivos() {
     setForm(initialForm)
   }
 
+  const openEdit = (cultivo) => {
+    setEditCultivo(cultivo)
+    setEditForm({
+      cultivo: cultivo.cultivo || 'Soja',
+      campana: cultivo.campana || '',
+      fechaSiembra: cultivo.fechaSiembra || '',
+      variedad: cultivo.variedad || '',
+      fechaCosecha: cultivo.fechaCosecha || '',
+      rendimientoEsperado: cultivo.rendimientoEsperado || '',
+      rendimientoReal: cultivo.rendimientoReal || '',
+    })
+  }
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target
+    setEditForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleEditSubmit = async (event) => {
+    event.preventDefault()
+    if (!editCultivo) return
+    setSavingEdit(true)
+    await updateDoc(doc(db, 'cultivos', editCultivo.id), {
+      ...editForm,
+      rendimientoEsperado: Number(editForm.rendimientoEsperado || 0),
+      rendimientoReal: Number(editForm.rendimientoReal || 0),
+    })
+    setSavingEdit(false)
+    setEditCultivo(null)
+  }
+
+  const handleDelete = async (cultivo) => {
+    const confirmDelete = window.confirm('Eliminar cultivo?')
+    if (!confirmDelete) return
+    await deleteDoc(doc(db, 'cultivos', cultivo.id))
+  }
+
   return (
     <div className="page">
       <PageHeader
         title="Cultivos"
-        subtitle="Gestiona campanas, variedades y rendimiento."
+        subtitle="Gestiona campañas, variedades y rendimiento."
       />
       <section className="two-column">
         <div className="card">
@@ -78,7 +122,7 @@ function Cultivos() {
             <input
               className="input"
               name="campana"
-              placeholder="Campana (2024/25)"
+              placeholder="Campaña (2024/25)"
               value={form.campana}
               onChange={handleChange}
               required
@@ -127,7 +171,7 @@ function Cultivos() {
         </div>
 
         <div className="card">
-          <h2>Campanas</h2>
+          <h2>Campañas</h2>
           {cultivos.length === 0 ? (
             <div className="empty-state">No hay cultivos registrados.</div>
           ) : (
@@ -146,12 +190,108 @@ function Cultivos() {
                     <span>Esperado: {cultivo.rendimientoEsperado}</span>
                     <span>Real: {cultivo.rendimientoReal}</span>
                   </div>
+                  <div className="row-actions">
+                    <button
+                      className="icon-button"
+                      type="button"
+                      onClick={() => openEdit(cultivo)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="icon-button danger"
+                      type="button"
+                      onClick={() => handleDelete(cultivo)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       </section>
+
+      <Modal
+        open={Boolean(editCultivo)}
+        title="Editar cultivo"
+        onClose={() => setEditCultivo(null)}
+        actions={
+          <button
+            className="primary-button"
+            type="submit"
+            form="edit-cultivo-form"
+            disabled={savingEdit}
+          >
+            {savingEdit ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        }
+      >
+        <form
+          className="form-grid"
+          id="edit-cultivo-form"
+          onSubmit={handleEditSubmit}
+        >
+          <select
+            className="input"
+            name="cultivo"
+            value={editForm?.cultivo || 'Soja'}
+            onChange={handleEditChange}
+          >
+            <option>Soja</option>
+            <option>Maiz</option>
+            <option>Trigo</option>
+            <option>Girasol</option>
+            <option>Cebada</option>
+          </select>
+          <input
+            className="input"
+            name="campana"
+            placeholder="Campaña (2024/25)"
+            value={editForm?.campana || ''}
+            onChange={handleEditChange}
+            required
+          />
+          <input
+            className="input"
+            type="date"
+            name="fechaSiembra"
+            value={editForm?.fechaSiembra || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            name="variedad"
+            placeholder="Variedad"
+            value={editForm?.variedad || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="date"
+            name="fechaCosecha"
+            value={editForm?.fechaCosecha || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="rendimientoEsperado"
+            placeholder="Rendimiento esperado"
+            value={editForm?.rendimientoEsperado || ''}
+            onChange={handleEditChange}
+          />
+          <input
+            className="input"
+            type="number"
+            name="rendimientoReal"
+            placeholder="Rendimiento real"
+            value={editForm?.rendimientoReal || ''}
+            onChange={handleEditChange}
+          />
+        </form>
+      </Modal>
     </div>
   )
 }

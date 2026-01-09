@@ -58,7 +58,7 @@ function Costos() {
     <div className="page">
       <PageHeader
         title="Costos y finanzas"
-        subtitle="Margenes y rentabilidad por campana."
+        subtitle="Margenes y rentabilidad por campaña."
       />
       <section className="two-column">
         <div className="card">
@@ -90,7 +90,7 @@ function Costos() {
             <input
               className="input"
               name="campana"
-              placeholder="Campana"
+              placeholder="Campaña"
               value={form.campana}
               onChange={handleChange}
             />
@@ -137,7 +137,7 @@ function Costos() {
                     <span>{costo.cultivo}</span>
                   </div>
                   <div>
-                    <span>Campana: {costo.campana || 'Sin campana'}</span>
+                    <span>Campaña: {costo.campana || 'Sin campaña'}</span>
                     <span>Ingresos: {costo.ingresosCosecha}</span>
                   </div>
                   <div>
