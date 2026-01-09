@@ -538,8 +538,8 @@ select:focus {
 }
 
 .form-grid .primary-button {
-  padding: 8px 12px;
-  font-size: 13px;
+  padding: 7px 12px;
+  font-size: 12.5px;
 }
 
 .primary-button.small {
