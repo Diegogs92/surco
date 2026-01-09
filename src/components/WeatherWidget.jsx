@@ -9,6 +9,7 @@ function WeatherWidget() {
   const [weather, setWeather] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const q = query(collection(db, 'campos'), orderBy('nombre', 'asc'))
@@ -18,6 +19,15 @@ function WeatherWidget() {
         ...docSnap.data(),
       }))
       const coordsList = campos
+        .filter(
+          (campo) =>
+            campo.lat !== null &&
+            campo.lat !== undefined &&
+            campo.lat !== '' &&
+            campo.lng !== null &&
+            campo.lng !== undefined &&
+            campo.lng !== '',
+        )
         .map((campo) => ({
           lat: Number(campo.lat),
           lng: Number(campo.lng),
@@ -49,9 +59,11 @@ function WeatherWidget() {
       if (!coords) {
         setLoading(false)
         setWeather(null)
+        setError('')
         return
       }
       setLoading(true)
+      setError('')
       const params = new URLSearchParams({
         latitude: coords.lat,
         longitude: coords.lng,
@@ -70,6 +82,7 @@ function WeatherWidget() {
     }
 
     fetchWeather().catch(() => {
+      setError('No se pudo obtener el clima.')
       setLoading(false)
     })
   }, [coords])
@@ -79,7 +92,6 @@ function WeatherWidget() {
       setAlerts([])
       return
     }
-    const hours = weather.hourly.time?.slice(0, 24) || []
     const temps = weather.hourly.temperature_2m?.slice(0, 24) || []
     const precip = weather.hourly.precipitation?.slice(0, 24) || []
     const precipProb =
@@ -87,7 +99,9 @@ function WeatherWidget() {
     const codes = weather.hourly.weather_code?.slice(0, 24) || []
 
     const frost = temps.some((temp) => temp <= 0)
-    const rain = precip.some((val, idx) => val >= 1 && (precipProb[idx] || 0) >= 60)
+    const rain = precip.some(
+      (val, idx) => val >= 1 && (precipProb[idx] || 0) >= 60,
+    )
     const hail = codes.some((code) => [95, 96, 99].includes(code))
 
     const nextAlerts = []
@@ -118,13 +132,17 @@ function WeatherWidget() {
     )
   }
 
+  if (error) {
+    return <div className="weather-widget muted">{error}</div>
+  }
+
   return (
     <div className="weather-widget">
       <div>
         <p className="weather-title">Clima en campos</p>
         {current ? (
           <p className="weather-value">
-            {current.temp}°C · {current.wind} km/h
+            {current.temp} C / {current.wind} km/h
           </p>
         ) : (
           <p className="weather-value">Sin datos</p>
