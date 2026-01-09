@@ -18,7 +18,6 @@ import Modal from '../components/Modal.jsx'
 
 const initialForm = {
   nombre: '',
-  ubicacion: '',
   superficie: '',
   estado: 'Activo',
   historial: '',
@@ -247,13 +246,6 @@ function Campos() {
             />
             <input
               className="input"
-              name="ubicacion"
-              placeholder="Ubicacion"
-              value={form.ubicacion}
-              onChange={handleChange}
-            />
-            <input
-              className="input"
               type="number"
               name="superficie"
               placeholder="Superficie (ha)"
@@ -372,21 +364,17 @@ function Campos() {
                   </div>
                   <div>
                     <strong>{campo.nombre}</strong>
-                    <span>{campo.ubicacion || 'Sin ubicacion'}</span>
-                  </div>
-                  <div>
-                    <span>{campo.superficie} ha</span>
-                    <span>{campo.estado}</span>
-                  </div>
-                  <div>
                     {campo.lat && campo.lng ? (
                       <span>
-                        {Number(campo.lat).toFixed(4)},{' '}
-                        {Number(campo.lng).toFixed(4)}
+                        {Number(campo.lat).toFixed(4)}, {Number(campo.lng).toFixed(4)}
                       </span>
                     ) : (
                       <span>Sin coordenadas</span>
                     )}
+                  </div>
+                  <div>
+                    <span>{campo.superficie} ha</span>
+                    <span>{campo.estado}</span>
                   </div>
                   <div className="row-actions">
                     <button
@@ -434,13 +422,6 @@ function Campos() {
             value={editForm?.nombre || ''}
             onChange={handleEditChange}
             required
-          />
-          <input
-            className="input"
-            name="ubicacion"
-            placeholder="Ubicacion"
-            value={editForm?.ubicacion || ''}
-            onChange={handleEditChange}
           />
           <input
             className="input"
