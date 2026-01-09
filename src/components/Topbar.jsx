@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import WeatherWidget from './WeatherWidget.jsx'
+import FieldWeatherBadges from './FieldWeatherBadges.jsx'
 
 function SunIcon() {
   return (
@@ -51,7 +51,7 @@ function Topbar() {
           <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
         </div>
       </div>
-      <WeatherWidget />
+      <FieldWeatherBadges />
       <div className="topbar-actions">
         <button
           className="ghost-button icon"

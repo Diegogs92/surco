@@ -945,6 +945,75 @@ select:focus {
   margin-left: auto;
 }
 
+/* Badges de clima por campo */
+.field-weather-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 220px;
+}
+
+.field-weather-badges .muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.field-weather-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-m);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  transition: all 0.15s ease;
+  font-size: 12px;
+}
+
+.field-weather-badge:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(35, 150, 127, 0.15);
+}
+
+.field-weather-badge.loading {
+  opacity: 0.6;
+}
+
+.field-weather-badge.error {
+  border-color: var(--border);
+  opacity: 0.5;
+}
+
+.field-weather-badge .field-name {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.field-weather-badge .weather-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+}
+
+.field-weather-badge .weather-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.field-weather-badge .weather-temp {
+  font-weight: 600;
+  color: var(--primary);
+}
+
 .map-box {
   grid-column: 1 / -1;
   height: 240px;
@@ -1026,6 +1095,27 @@ select:focus {
   }
 
   .weather-value {
+    font-size: 13px;
+  }
+
+  .field-weather-badges {
+    width: 100%;
+    flex: 1 1 100%;
+    min-width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .field-weather-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .field-weather-badge .field-name {
+    max-width: 80px;
+  }
+
+  .field-weather-badge .weather-icon {
     font-size: 13px;
   }
 
