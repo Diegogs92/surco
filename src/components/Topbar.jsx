@@ -45,9 +45,7 @@ function Topbar() {
   return (
     <header className="topbar">
       <div className="brand-inline">
-        <span className="brand-mark">
-          <img src="/surco%20logo.svg" alt="Surco" />
-        </span>
+        <img className="brand-logo" src="/surco%20logo.svg" alt="Surco" />
         <div>
           <p className="brand-title">Surco</p>
           <p className="brand-subtitle">Gestion agricola al maximo nivel</p>

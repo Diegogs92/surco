@@ -12,10 +12,10 @@ function Login() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">S</span>
+          <img className="brand-logo" src="/surco%20logo.svg" alt="Surco" />
           <div>
             <p className="brand-title">Surco</p>
-            <p className="brand-subtitle">Gestion inteligente</p>
+            <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
           </div>
         </div>
         <h1>Acceso rapido</h1>

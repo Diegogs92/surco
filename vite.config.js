@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-192.svg', 'pwa-512.svg', 'surco logo.svg'],
       manifest: {
-        name: 'Surco Mantenimiento',
+        name: 'Surco',
         short_name: 'Surco',
-        description: 'Gestion de maquinaria agricola, reportes y mantenimientos.',
+        description: 'Gestion agricola al maximo nivel.',
         theme_color: '#23967F',
         background_color: '#E3D0D8',
         display: 'standalone',
