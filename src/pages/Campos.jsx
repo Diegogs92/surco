@@ -35,6 +35,7 @@ function Campos() {
   const [photoPreviews, setPhotoPreviews] = useState([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [userCenter, setUserCenter] = useState(null)
   const [editCampo, setEditCampo] = useState(null)
   const [editForm, setEditForm] = useState(null)
   const [editPhotos, setEditPhotos] = useState([])
@@ -58,6 +59,22 @@ function Campos() {
   }, [])
 
   useEffect(() => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserCenter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+      },
+      () => {
+        setUserCenter(null)
+      },
+      { enableHighAccuracy: true, timeout: 8000 },
+    )
+  }, [])
+
+  useEffect(() => {
     if (!photos.length) {
       setPhotoPreviews([])
       return undefined
@@ -71,8 +88,8 @@ function Campos() {
     if (form.lat && form.lng) {
       return { lat: Number(form.lat), lng: Number(form.lng) }
     }
-    return defaultCenter
-  }, [form.lat, form.lng])
+    return userCenter || defaultCenter
+  }, [form.lat, form.lng, userCenter])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -469,7 +486,7 @@ function Campos() {
                 center={
                   editForm?.lat && editForm?.lng
                     ? { lat: Number(editForm.lat), lng: Number(editForm.lng) }
-                    : defaultCenter
+                    : userCenter || defaultCenter
                 }
                 zoom={12}
                 onClick={(event) =>

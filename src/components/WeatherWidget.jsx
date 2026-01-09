@@ -10,6 +10,7 @@ function WeatherWidget() {
   const [alerts, setAlerts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [requestedGeo, setRequestedGeo] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, 'campos'), orderBy('nombre', 'asc'))
@@ -61,6 +62,27 @@ function WeatherWidget() {
     )
     return () => unsub()
   }, [])
+
+  useEffect(() => {
+    if (coords || requestedGeo) return
+    if (!navigator.geolocation) {
+      setError('Geolocalizacion no disponible.')
+      return
+    }
+    setRequestedGeo(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+      },
+      () => {
+        setError('Habilita ubicacion o agrega coordenadas en Campos.')
+      },
+      { enableHighAccuracy: true, timeout: 8000 },
+    )
+  }, [coords, requestedGeo])
 
   useEffect(() => {
     const fetchWeather = async () => {
