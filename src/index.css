@@ -393,6 +393,11 @@ select {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.form-grid .primary-button {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
 .primary-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(35, 150, 127, 0.25);
@@ -409,6 +414,19 @@ select {
   background: transparent;
   color: var(--text-main);
   cursor: pointer;
+}
+
+.ghost-button.icon {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .table {
