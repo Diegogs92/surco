@@ -47,6 +47,9 @@ export function AuthProvider({ children }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    })
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
     if (isMobile) {
       return signInWithRedirect(auth, provider)

@@ -18,9 +18,9 @@ function Login() {
             <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
           </div>
         </div>
-        <h1>Acceso rapido</h1>
+        <h1>Acceso rápido</h1>
         <p>
-          Inicia sesion con Google para registrar maquinaria, reportes y
+          Inicia sesión con Google para registrar maquinaria, reportes y
           mantenimientos desde el campo o la oficina.
         </p>
         <button className="primary-button full" onClick={loginWithGoogle}>
@@ -28,11 +28,11 @@ function Login() {
         </button>
         <div className="auth-footer">
           <span>Modo offline disponible</span>
-          <span>Sincroniza al recuperar conexion</span>
+          <span>Sincroniza al recuperar conexión</span>
         </div>
       </div>
       <div className="auth-panel">
-        <h2>Operacion simple, rapida y en terreno.</h2>
+        <h2>Operación simple, rápida y en terreno.</h2>
         <p>
           Captura reportes en segundos, planifica mantenimientos preventivos y
           revisa historial completo por equipo.
@@ -40,7 +40,7 @@ function Login() {
         <div className="auth-grid">
           <div>
             <strong>Campos</strong>
-            <span>Ubicacion y lotes</span>
+            <span>Ubicación y lotes</span>
           </div>
           <div>
             <strong>Cultivos</strong>
@@ -48,7 +48,7 @@ function Login() {
           </div>
           <div>
             <strong>Tareas</strong>
-            <span>Planificacion diaria</span>
+            <span>Planificación diaria</span>
           </div>
           <div>
             <strong>Personal</strong>
