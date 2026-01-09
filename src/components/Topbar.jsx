@@ -44,9 +44,14 @@ function Topbar() {
 
   return (
     <header className="topbar">
-      <div>
-        <p className="topbar-title">Operacion agricola</p>
-        <p className="topbar-subtitle">Campos, cultivos y costos en un solo lugar</p>
+      <div className="brand-inline">
+        <span className="brand-mark">
+          <img src="/surco%20logo.svg" alt="Surco" />
+        </span>
+        <div>
+          <p className="brand-title">Surco</p>
+          <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
+        </div>
       </div>
       <WeatherWidget />
       <div className="topbar-actions">

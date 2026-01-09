@@ -15,10 +15,12 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <span className="brand-mark">S</span>
+        <span className="brand-mark">
+          <img src="/surco%20logo.svg" alt="Surco" />
+        </span>
         <div>
           <p className="brand-title">Surco</p>
-          <p className="brand-subtitle">Mantenimiento</p>
+          <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
         </div>
       </div>
       <nav className="nav">

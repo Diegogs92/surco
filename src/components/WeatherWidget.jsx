@@ -13,44 +13,52 @@ function WeatherWidget() {
 
   useEffect(() => {
     const q = query(collection(db, 'campos'), orderBy('nombre', 'asc'))
-    const unsub = onSnapshot(q, (snapshot) => {
-      const campos = snapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }))
-      const coordsList = campos
-        .filter(
-          (campo) =>
-            campo.lat !== null &&
-            campo.lat !== undefined &&
-            campo.lat !== '' &&
-            campo.lng !== null &&
-            campo.lng !== undefined &&
-            campo.lng !== '',
-        )
-        .map((campo) => ({
-          lat: Number(campo.lat),
-          lng: Number(campo.lng),
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const campos = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
         }))
-        .filter(
-          (coord) => Number.isFinite(coord.lat) && Number.isFinite(coord.lng),
+        const coordsList = campos
+          .filter(
+            (campo) =>
+              campo.lat !== null &&
+              campo.lat !== undefined &&
+              campo.lat !== '' &&
+              campo.lng !== null &&
+              campo.lng !== undefined &&
+              campo.lng !== '',
+          )
+          .map((campo) => ({
+            lat: Number(campo.lat),
+            lng: Number(campo.lng),
+          }))
+          .filter(
+            (coord) =>
+              Number.isFinite(coord.lat) && Number.isFinite(coord.lng),
+          )
+        if (!coordsList.length) {
+          setCoords(null)
+          return
+        }
+        const avg = coordsList.reduce(
+          (acc, coord) => ({
+            lat: acc.lat + coord.lat,
+            lng: acc.lng + coord.lng,
+          }),
+          { lat: 0, lng: 0 },
         )
-      if (!coordsList.length) {
-        setCoords(null)
-        return
-      }
-      const avg = coordsList.reduce(
-        (acc, coord) => ({
-          lat: acc.lat + coord.lat,
-          lng: acc.lng + coord.lng,
-        }),
-        { lat: 0, lng: 0 },
-      )
-      setCoords({
-        lat: avg.lat / coordsList.length,
-        lng: avg.lng / coordsList.length,
-      })
-    })
+        setCoords({
+          lat: avg.lat / coordsList.length,
+          lng: avg.lng / coordsList.length,
+        })
+      },
+      () => {
+        setError('Sin permisos para leer campos.')
+        setLoading(false)
+      },
+    )
     return () => unsub()
   }, [])
 
