@@ -133,7 +133,7 @@ function WeatherWidget() {
         setLoading(false)
       } catch (err) {
         console.error('Weather fetch error:', err)
-        setError(`Error: ${err.message}`)
+        setError('No se pudo obtener el clima')
         setLoading(false)
       }
     }
@@ -187,7 +187,11 @@ function WeatherWidget() {
   }
 
   if (error) {
-    return <div className="weather-widget muted">{error}</div>
+    return (
+      <div className="weather-widget muted">
+        No se pudo obtener el clima
+      </div>
+    )
   }
 
   return (
