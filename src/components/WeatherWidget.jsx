@@ -3,6 +3,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../firebase.js'
 
 const WEATHER_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
+const WEATHER_TIMEOUT_MS = 8000
 
 function WeatherWidget() {
   const [coords, setCoords] = useState(null)
@@ -94,6 +95,8 @@ function WeatherWidget() {
       }
       setLoading(true)
       setError('')
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), WEATHER_TIMEOUT_MS)
       try {
         const params = new URLSearchParams({
           latitude: coords.lat.toFixed(4),
@@ -102,29 +105,22 @@ function WeatherWidget() {
           hourly:
             'temperature_2m,precipitation,precipitation_probability,weather_code',
           timezone: 'auto',
-          forecast_days: 1,
+          forecast_days: '1',
         })
-        const url = `${WEATHER_ENDPOINT}?${params}`
-        console.log('Fetching weather from:', url)
-
-        const response = await fetch(url, {
+        const response = await fetch(`${WEATHER_ENDPOINT}?${params}`, {
           method: 'GET',
+          signal: controller.signal,
+          cache: 'no-store',
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
         })
 
-        console.log('Weather API response status:', response.status)
-
         if (!response.ok) {
-          const errorText = await response.text()
-          console.error('Weather API error:', errorText)
           throw new Error(`Weather API returned ${response.status}`)
         }
 
         const data = await response.json()
-        console.log('Weather data received:', data)
-
         if (!data || !data.current) {
           throw new Error('Invalid weather data structure')
         }
@@ -132,9 +128,12 @@ function WeatherWidget() {
         setWeather(data)
         setLoading(false)
       } catch (err) {
-        console.error('Weather fetch error:', err)
-        setError('No se pudo obtener el clima')
+        setError(
+          'No se pudo obtener el clima. Verifica acceso a api.open-meteo.com.',
+        )
         setLoading(false)
+      } finally {
+        clearTimeout(timeoutId)
       }
     }
 
@@ -187,11 +186,7 @@ function WeatherWidget() {
   }
 
   if (error) {
-    return (
-      <div className="weather-widget muted">
-        No se pudo obtener el clima
-      </div>
-    )
+    return <div className="weather-widget muted">{error}</div>
   }
 
   return (
@@ -200,7 +195,7 @@ function WeatherWidget() {
         <p className="weather-title">Clima en campos</p>
         {current ? (
           <p className="weather-value">
-            {current.temp}°C / {current.wind} km/h
+            {current.temp} C / {current.wind} km/h
           </p>
         ) : (
           <p className="weather-value">Sin datos</p>
