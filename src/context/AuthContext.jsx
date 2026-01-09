@@ -3,6 +3,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   getRedirectResult,
+  signInWithPopup,
   signInWithRedirect,
   signOut,
 } from 'firebase/auth'
@@ -46,7 +47,15 @@ export function AuthProvider({ children }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
-    return signInWithRedirect(auth, provider)
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    if (isMobile) {
+      return signInWithRedirect(auth, provider)
+    }
+    try {
+      return await signInWithPopup(auth, provider)
+    } catch {
+      return signInWithRedirect(auth, provider)
+    }
   }
 
   const logout = () => signOut(auth)
