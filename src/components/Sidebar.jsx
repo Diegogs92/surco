@@ -1,16 +1,25 @@
 import { NavLink } from 'react-router-dom'
 
-const navItems = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/campos', label: 'Campos' },
-  { to: '/cultivos', label: 'Cultivos' },
-  { to: '/tareas', label: 'Tareas' },
-  { to: '/maquinaria', label: 'Maquinaria' },
-  { to: '/reportes', label: 'Reportes' },
-  { to: '/personal', label: 'Personal' },
-  { to: '/insumos', label: 'Insumos' },
-  { to: '/proveedores', label: 'Proveedores' },
-  { to: '/costos', label: 'Costos' },
+const navGroups = [
+  {
+    label: 'Agricultura',
+    items: [
+      { to: '/cultivos', label: 'Cultivos' },
+      { to: '/tareas', label: 'Tareas' },
+      { to: '/insumos', label: 'Insumos' },
+      { to: '/maquinaria', label: 'Maquinaria' },
+      { to: '/proveedores', label: 'Proveedores' },
+      { to: '/costos', label: 'Costos' },
+    ],
+  },
+  {
+    label: 'Ganaderia',
+    items: [
+      { to: '/campos', label: 'Campos' },
+      { to: '/personal', label: 'Personal' },
+      { to: '/reportes', label: 'Reportes' },
+    ],
+  },
 ]
 
 function Sidebar() {
@@ -24,16 +33,27 @@ function Sidebar() {
         </div>
       </div>
       <nav className="nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              isActive ? 'nav-link active' : 'nav-link'
-            }
-          >
-            {item.label}
-          </NavLink>
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+        >
+          Dashboard
+        </NavLink>
+        {navGroups.map((group) => (
+          <div className="nav-group" key={group.label}>
+            <span className="nav-group-title">{group.label}</span>
+            {group.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
       <div className="sidebar-footer">

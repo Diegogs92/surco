@@ -203,6 +203,20 @@ p {
   padding-right: 6px;
 }
 
+.nav-group {
+  display: grid;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.nav-group-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding-left: 4px;
+}
+
 .nav-link {
   padding: 9px 11px;
   border-radius: var(--radius-s);
