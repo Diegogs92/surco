@@ -35,7 +35,8 @@
   --input-bg: rgba(255, 255, 255, 0.4);
   --input-bg-focus: rgba(255, 255, 255, 0.62);
   --text-main: #1a1616;
-  --text-muted: #4a3d3b;
+  --text-muted: #3e3432;
+  --placeholder: rgba(62, 52, 50, 0.75);
   --border: rgba(35, 150, 127, 0.16);
 }
 
@@ -49,7 +50,8 @@
   --input-bg: rgba(34, 30, 30, 0.45);
   --input-bg-focus: rgba(34, 30, 30, 0.6);
   --text-main: #f7f4f3;
-  --text-muted: #b5a8a6;
+  --text-muted: #cec3c1;
+  --placeholder: rgba(206, 195, 193, 0.75);
   --border: rgba(227, 208, 216, 0.14);
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
@@ -506,8 +508,8 @@ select:focus {
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: var(--placeholder);
+  opacity: 1;
 }
 
 .input.compact {
