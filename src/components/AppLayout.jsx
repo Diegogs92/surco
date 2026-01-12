@@ -3,6 +3,7 @@ import Sidebar from './Sidebar.jsx'
 import Topbar from './Topbar.jsx'
 import BottomNav from './BottomNav.jsx'
 import OfflineBanner from './OfflineBanner.jsx'
+import { Breadcrumbs } from './Breadcrumbs.jsx'
 
 function AppLayout() {
   return (
@@ -12,6 +13,7 @@ function AppLayout() {
         <Topbar />
         <OfflineBanner />
         <main className="content">
+          <Breadcrumbs />
           <Outlet />
         </main>
       </div>
