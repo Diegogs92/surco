@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Large video files (hosted in Firebase, not in git)
+public/*.mp4
+public/*.mov
+public/*.webm
+!public/background.mp4
