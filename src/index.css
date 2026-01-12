@@ -489,6 +489,35 @@ p {
   font-weight: 500;
 }
 
+/* Weather badges en navbar */
+.navbar .field-weather-badges {
+  margin-left: auto;
+  margin-right: 16px;
+  flex: 0 1 auto;
+  min-width: auto;
+  max-width: 600px;
+}
+
+.navbar .field-weather-badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.navbar .field-weather-badge .field-name {
+  max-width: 80px;
+  font-size: 11px;
+}
+
+.navbar .field-weather-badge .weather-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.navbar .field-weather-badge .weather-temp {
+  font-size: 11px;
+}
+
 .app-main {
   display: flex;
   flex-direction: column;

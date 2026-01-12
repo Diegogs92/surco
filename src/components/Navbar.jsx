@@ -20,6 +20,7 @@ import {
   Settings,
   ChevronDown,
 } from 'lucide-react'
+import FieldWeatherBadges from './FieldWeatherBadges.jsx'
 
 const navGroups = [
   {
@@ -140,6 +141,8 @@ function Navbar() {
           )
         })}
       </div>
+
+      <FieldWeatherBadges />
 
       <div className="navbar-footer">
         <span className="navbar-hint">Campo y oficina</span>
