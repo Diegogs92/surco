@@ -236,12 +236,13 @@ p {
 }
 
 .nav-group-icon {
-  font-size: 18px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 22px;
+  flex-shrink: 0;
+  color: var(--text-main);
 }
 
 .nav-group-label {
@@ -297,17 +298,13 @@ p {
 }
 
 .nav-item-icon {
-  font-size: 16px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 20px;
   flex-shrink: 0;
-}
-
-.nav-item.active .nav-item-icon {
-  filter: brightness(1.2);
+  color: inherit;
 }
 
 .nav-item-label {
@@ -1484,8 +1481,10 @@ select:focus {
   }
 
   .bottom-link-icon {
-    font-size: 18px;
     line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .bottom-link-label {
