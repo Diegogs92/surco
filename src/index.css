@@ -478,8 +478,15 @@ p {
   box-shadow: 0 4px 12px rgba(35, 150, 127, 0.25);
 }
 
-.navbar-footer {
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+.navbar-footer {
   flex-shrink: 0;
 }
 
