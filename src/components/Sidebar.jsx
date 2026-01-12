@@ -47,11 +47,7 @@ const navGroups = [
 
 function Sidebar() {
   const location = useLocation()
-  const [openGroups, setOpenGroups] = useState(() =>
-    Object.fromEntries(
-      navGroups.map((group) => [group.key, Boolean(group.defaultOpen)]),
-    ),
-  )
+  const [activeGroup, setActiveGroup] = useState(null)
 
   const activeGroupKeys = useMemo(() => {
     return navGroups
@@ -65,21 +61,11 @@ function Sidebar() {
 
   useEffect(() => {
     if (!activeGroupKeys.length) return
-    setOpenGroups((prev) => {
-      let changed = false
-      const next = { ...prev }
-      activeGroupKeys.forEach((key) => {
-        if (!next[key]) {
-          next[key] = true
-          changed = true
-        }
-      })
-      return changed ? next : prev
-    })
+    setActiveGroup((prev) => prev || activeGroupKeys[0])
   }, [activeGroupKeys])
 
   const toggleGroup = (key) => {
-    setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }))
+    setActiveGroup((prev) => (prev === key ? null : key))
   }
 
   return (
@@ -101,35 +87,38 @@ function Sidebar() {
         {navGroups.map((group) => (
           <div className="nav-group" key={group.key}>
             <button
-              className="nav-group-toggle"
+              className={`nav-group-toggle ${
+                activeGroup === group.key ? 'active' : ''
+              }`}
               type="button"
               onClick={() => toggleGroup(group.key)}
-              aria-expanded={openGroups[group.key]}
+              aria-expanded={activeGroup === group.key}
             >
               <span className="nav-group-title">{group.label}</span>
               <span
-                className={`nav-group-icon ${openGroups[group.key] ? 'open' : ''}`}
+                className={`nav-group-icon ${activeGroup === group.key ? 'open' : ''}`}
               >
                 &gt;
               </span>
             </button>
-            <div
-              className={`nav-group-items ${
-                openGroups[group.key] ? 'open' : 'collapsed'
-              }`}
-            >
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    isActive ? 'nav-link active' : 'nav-link'
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </div>
+            {activeGroup === group.key && (
+              <div className="nav-panel">
+                <div className="nav-panel-grid">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        isActive ? 'nav-panel-link active' : 'nav-panel-link'
+                      }
+                      onClick={() => setActiveGroup(null)}
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </nav>

@@ -205,8 +205,9 @@ p {
 
 .nav-group {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   padding-top: 6px;
+  position: relative;
 }
 
 .nav-group-toggle {
@@ -216,9 +217,11 @@ p {
   gap: 8px;
   border: none;
   background: transparent;
-  padding: 2px 4px;
+  padding: 6px 8px;
   cursor: pointer;
   color: var(--text-muted);
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .nav-group-title {
@@ -241,13 +244,49 @@ p {
   color: var(--text-main);
 }
 
-.nav-group-items {
+.nav-group-toggle.active {
+  background: var(--surface-glass);
+  color: var(--text-main);
+}
+
+.nav-panel {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 0;
+  min-width: 220px;
+  background: var(--surface-glass-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  z-index: 5;
+}
+
+.nav-panel-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 8px;
 }
 
-.nav-group-items.collapsed {
-  display: none;
+.nav-panel-link {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-glass);
+  color: var(--text-main);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.nav-panel-link:hover {
+  background: var(--bg-muted);
+  transform: translateY(-1px);
+}
+
+.nav-panel-link.active {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .nav-link {
