@@ -48,7 +48,7 @@ const navGroups = [
     label: 'Agricultura',
     icon: Sprout,
     items: [
-      { to: '/lotes-agricolas', label: 'Lotes agrícolas', icon: Map },
+      { to: '/lotes-agricolas', label: 'Lotes', icon: Map },
       { to: '/cultivos', label: 'Cultivos', icon: Leaf },
       { to: '/campanas', label: 'Campañas', icon: Calendar },
       { to: '/registros-agricolas', label: 'Siembra y cosecha', icon: Wheat },
@@ -60,10 +60,10 @@ const navGroups = [
     label: 'Ganadería',
     icon: Beef,
     items: [
-      { to: '/ganaderia', label: 'Gestión ganadera', icon: Beef },
-      { to: '/insumos?tipo=ganadero', label: 'Insumos ganaderos', icon: Package },
-      { to: '/maquinaria?tipo=ganadera', label: 'Maquinaria ganadera', icon: Tractor },
-      { to: '/tareas?tipo=ganadera', label: 'Tareas ganaderas', icon: ClipboardList },
+      { to: '/ganaderia', label: 'Ganado', icon: Beef },
+      { to: '/insumos?tipo=ganadero', label: 'Insumos', icon: Package },
+      { to: '/maquinaria?tipo=ganadera', label: 'Maquinaria', icon: Tractor },
+      { to: '/tareas?tipo=ganadera', label: 'Tareas', icon: ClipboardList },
     ],
   },
 ]
