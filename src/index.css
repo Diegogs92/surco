@@ -60,6 +60,22 @@
   box-sizing: border-box;
 }
 
+/* Smooth theme transitions */
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body,
+.sidebar,
+.topbar,
+.card,
+.nav-item,
+.bottom-nav {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -1540,6 +1556,47 @@ select:focus {
     gap: 8px;
   }
 
+}
+
+/* Skeleton Loaders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-muted) 0%,
+    var(--surface-glass) 50%,
+    var(--bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-circular {
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-mb-8 {
+  margin-bottom: 8px;
+}
+
+.skeleton-table {
+  display: grid;
+  gap: 10px;
 }
 
 /* Toast Notifications */
