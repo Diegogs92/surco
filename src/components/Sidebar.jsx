@@ -1,8 +1,11 @@
-import { NavLink } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 
 const navGroups = [
   {
+    key: 'compartidos',
     label: 'Compartidos',
+    defaultOpen: true,
     items: [
       { to: '/campos', label: 'Campos' },
       { to: '/personal', label: 'Personal' },
@@ -15,7 +18,9 @@ const navGroups = [
     ],
   },
   {
+    key: 'agricultura',
     label: 'Agricultura',
+    defaultOpen: true,
     items: [
       { to: '/lotes-agricolas', label: 'Lotes agricolas' },
       { to: '/cultivos', label: 'Cultivos' },
@@ -28,7 +33,9 @@ const navGroups = [
     ],
   },
   {
+    key: 'ganaderia',
     label: 'Ganaderia',
+    defaultOpen: false,
     items: [
       { to: '/ganaderia', label: 'Gestion ganadera' },
       { to: '/insumos?tipo=ganadero', label: 'Insumos ganaderos' },
@@ -39,6 +46,42 @@ const navGroups = [
 ]
 
 function Sidebar() {
+  const location = useLocation()
+  const [openGroups, setOpenGroups] = useState(() =>
+    Object.fromEntries(
+      navGroups.map((group) => [group.key, Boolean(group.defaultOpen)]),
+    ),
+  )
+
+  const activeGroupKeys = useMemo(() => {
+    return navGroups
+      .filter((group) =>
+        group.items.some(
+          (item) => item.to.split('?')[0] === location.pathname,
+        ),
+      )
+      .map((group) => group.key)
+  }, [location.pathname])
+
+  useEffect(() => {
+    if (!activeGroupKeys.length) return
+    setOpenGroups((prev) => {
+      let changed = false
+      const next = { ...prev }
+      activeGroupKeys.forEach((key) => {
+        if (!next[key]) {
+          next[key] = true
+          changed = true
+        }
+      })
+      return changed ? next : prev
+    })
+  }, [activeGroupKeys])
+
+  const toggleGroup = (key) => {
+    setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -56,19 +99,37 @@ function Sidebar() {
           Dashboard
         </NavLink>
         {navGroups.map((group) => (
-          <div className="nav-group" key={group.label}>
-            <span className="nav-group-title">{group.label}</span>
-            {group.items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  isActive ? 'nav-link active' : 'nav-link'
-                }
+          <div className="nav-group" key={group.key}>
+            <button
+              className="nav-group-toggle"
+              type="button"
+              onClick={() => toggleGroup(group.key)}
+              aria-expanded={openGroups[group.key]}
+            >
+              <span className="nav-group-title">{group.label}</span>
+              <span
+                className={`nav-group-icon ${openGroups[group.key] ? 'open' : ''}`}
               >
-                {item.label}
-              </NavLink>
-            ))}
+                &gt;
+              </span>
+            </button>
+            <div
+              className={`nav-group-items ${
+                openGroups[group.key] ? 'open' : 'collapsed'
+              }`}
+            >
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    isActive ? 'nav-link active' : 'nav-link'
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           </div>
         ))}
       </nav>

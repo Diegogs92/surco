@@ -209,12 +209,45 @@ p {
   padding-top: 6px;
 }
 
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
 .nav-group-title {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
-  padding-left: 4px;
+}
+
+.nav-group-icon {
+  font-size: 12px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-group-icon.open {
+  transform: rotate(90deg);
+}
+
+.nav-group-toggle:hover .nav-group-title,
+.nav-group-toggle:hover .nav-group-icon {
+  color: var(--text-main);
+}
+
+.nav-group-items {
+  display: grid;
+  gap: 8px;
+}
+
+.nav-group-items.collapsed {
+  display: none;
 }
 
 .nav-link {
