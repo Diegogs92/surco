@@ -4,6 +4,7 @@ import Topbar from './Topbar.jsx'
 import BottomNav from './BottomNav.jsx'
 import OfflineBanner from './OfflineBanner.jsx'
 import { Breadcrumbs } from './Breadcrumbs.jsx'
+import FloatingWeather from './FloatingWeather.jsx'
 
 function AppLayout() {
   return (
@@ -18,6 +19,7 @@ function AppLayout() {
         </main>
       </div>
       <BottomNav />
+      <FloatingWeather />
     </div>
   )
 }
