@@ -12,6 +12,11 @@ import Personal from './pages/Personal.jsx'
 import Insumos from './pages/Insumos.jsx'
 import Proveedores from './pages/Proveedores.jsx'
 import Costos from './pages/Costos.jsx'
+import Alertas from './pages/Alertas.jsx'
+import Campanas from './pages/Campanas.jsx'
+import LotesAgricolas from './pages/LotesAgricolas.jsx'
+import RegistrosAgricolas from './pages/RegistrosAgricolas.jsx'
+import Ganaderia from './pages/Ganaderia.jsx'
 import NotFound from './pages/NotFound.jsx'
 import BackgroundVideo from './components/BackgroundVideo.jsx'
 
@@ -34,6 +39,11 @@ function App() {
             <Route path="/insumos" element={<Insumos />} />
             <Route path="/proveedores" element={<Proveedores />} />
             <Route path="/costos" element={<Costos />} />
+            <Route path="/alertas" element={<Alertas />} />
+            <Route path="/campanas" element={<Campanas />} />
+            <Route path="/lotes-agricolas" element={<LotesAgricolas />} />
+            <Route path="/registros-agricolas" element={<RegistrosAgricolas />} />
+            <Route path="/ganaderia" element={<Ganaderia />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

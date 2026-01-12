@@ -2,22 +2,38 @@ import { NavLink } from 'react-router-dom'
 
 const navGroups = [
   {
-    label: 'Agricultura',
+    label: 'Compartidos',
     items: [
-      { to: '/cultivos', label: 'Cultivos' },
-      { to: '/tareas', label: 'Tareas' },
+      { to: '/campos', label: 'Campos' },
+      { to: '/personal', label: 'Personal' },
+      { to: '/proveedores', label: 'Proveedores' },
       { to: '/insumos', label: 'Insumos' },
       { to: '/maquinaria', label: 'Maquinaria' },
-      { to: '/proveedores', label: 'Proveedores' },
-      { to: '/costos', label: 'Costos' },
+      { to: '/tareas', label: 'Tareas' },
+      { to: '/alertas', label: 'Alertas' },
+      { to: '/reportes', label: 'Reportes' },
+    ],
+  },
+  {
+    label: 'Agricultura',
+    items: [
+      { to: '/lotes-agricolas', label: 'Lotes agricolas' },
+      { to: '/cultivos', label: 'Cultivos' },
+      { to: '/campanas', label: 'Campanas' },
+      { to: '/registros-agricolas', label: 'Siembra y cosecha' },
+      { to: '/insumos?tipo=agricola', label: 'Insumos agricolas' },
+      { to: '/maquinaria?tipo=agricola', label: 'Maquinaria agricola' },
+      { to: '/tareas?tipo=agricola', label: 'Tareas agricolas' },
+      { to: '/alertas?tipo=meteorologica', label: 'Alertas meteorologicas' },
     ],
   },
   {
     label: 'Ganaderia',
     items: [
-      { to: '/campos', label: 'Campos' },
-      { to: '/personal', label: 'Personal' },
-      { to: '/reportes', label: 'Reportes' },
+      { to: '/ganaderia', label: 'Gestion ganadera' },
+      { to: '/insumos?tipo=ganadero', label: 'Insumos ganaderos' },
+      { to: '/maquinaria?tipo=ganadera', label: 'Maquinaria ganadera' },
+      { to: '/tareas?tipo=ganadera', label: 'Tareas ganaderas' },
     ],
   },
 ]

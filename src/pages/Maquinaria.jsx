@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from 'firebase/firestore'
+import { useSearchParams } from 'react-router-dom'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
@@ -19,6 +20,7 @@ import { uploadFiles } from '../utils/uploadFiles.js'
 const initialForm = {
   maquinaria: '',
   tipo: '',
+  uso: 'Agricola',
   estado: 'Operativa',
 }
 
@@ -37,6 +39,7 @@ function Maquinaria() {
   const [editPreviews, setEditPreviews] = useState([])
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState('')
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
     const q = query(collection(db, 'maquinaria'), orderBy('createdAt', 'desc'))
@@ -61,22 +64,31 @@ function Maquinaria() {
     return () => previews.forEach((url) => URL.revokeObjectURL(url))
   }, [photos])
 
+  const tipoFiltro = useMemo(() => {
+    const tipo = searchParams.get('tipo')
+    if (tipo === 'ganadera' || tipo === 'ganadero') return 'Ganaderia'
+    if (tipo === 'agricola') return 'Agricola'
+    return ''
+  }, [searchParams])
+
   const stats = useMemo(() => {
-    const total = equipos.length
-    const operativas = equipos.filter((e) => e.estado === 'Operativa').length
-    const fuera = equipos.filter((e) => e.estado === 'Fuera de servicio').length
+    const data = tipoFiltro ? equipos.filter((e) => e.uso === tipoFiltro) : equipos
+    const total = data.length
+    const operativas = data.filter((e) => e.estado === 'Operativa').length
+    const fuera = data.filter((e) => e.estado === 'Fuera de servicio').length
     return { total, operativas, fuera }
-  }, [equipos])
+  }, [equipos, tipoFiltro])
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return equipos
+    const base = tipoFiltro ? equipos.filter((equipo) => equipo.uso === tipoFiltro) : equipos
+    if (!search.trim()) return base
     const term = search.toLowerCase()
-    return equipos.filter((equipo) =>
+    return base.filter((equipo) =>
       [equipo.maquinaria, equipo.tipo]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(term)),
     )
-  }, [equipos, search])
+  }, [equipos, search, tipoFiltro])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -129,6 +141,7 @@ function Maquinaria() {
     setEditForm({
       maquinaria: equipo.maquinaria || '',
       tipo: equipo.tipo || '',
+      uso: equipo.uso || 'Agricola',
       estado: equipo.estado || 'Operativa',
     })
     setEditPhotos([])
@@ -221,6 +234,15 @@ function Maquinaria() {
             />
             <select
               className="input"
+              name="uso"
+              value={form.uso}
+              onChange={handleChange}
+            >
+              <option>Agricola</option>
+              <option>Ganaderia</option>
+            </select>
+            <select
+              className="input"
               name="estado"
               value={form.estado}
               onChange={handleChange}
@@ -270,7 +292,9 @@ function Maquinaria() {
                   </div>
                   <div>
                     <strong>{equipo.maquinaria}</strong>
-                    <span>{equipo.tipo || 'Sin tipo'}</span>
+                    <span>
+                      {equipo.tipo || 'Sin tipo'} · {equipo.uso || 'Sin uso'}
+                    </span>
                   </div>
                   <div>
                     <span
@@ -339,6 +363,15 @@ function Maquinaria() {
             value={editForm?.tipo || ''}
             onChange={handleEditChange}
           />
+          <select
+            className="input"
+            name="uso"
+            value={editForm?.uso || 'Agricola'}
+            onChange={handleEditChange}
+          >
+            <option>Agricola</option>
+            <option>Ganaderia</option>
+          </select>
           <select
             className="input"
             name="estado"

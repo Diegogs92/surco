@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
   collection,
@@ -10,11 +10,13 @@ import {
   serverTimestamp,
   updateDoc,
 } from 'firebase/firestore'
+import { useSearchParams } from 'react-router-dom'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
 import Modal from '../components/Modal.jsx'
 
 const initialForm = {
+  actividad: 'Agricola',
   tipo: 'Siembra',
   fecha: '',
   campo: '',
@@ -35,6 +37,7 @@ function Tareas() {
   const [campos, setCampos] = useState([])
   const [empleados, setEmpleados] = useState([])
   const [insumos, setInsumos] = useState([])
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
     const q = query(collection(db, 'tareas'), orderBy('createdAt', 'desc'))
@@ -77,6 +80,19 @@ function Tareas() {
     }
   }, [])
 
+  const tipoFiltro = useMemo(() => {
+    const tipo = searchParams.get('tipo')
+    if (tipo === 'ganadera' || tipo === 'ganadero') return 'Ganaderia'
+    if (tipo === 'agricola') return 'Agricola'
+    return ''
+  }, [searchParams])
+
+  useEffect(() => {
+    if (tipoFiltro) {
+      setForm((prev) => ({ ...prev, actividad: tipoFiltro }))
+    }
+  }, [tipoFiltro])
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -97,6 +113,7 @@ function Tareas() {
   const openEdit = (tarea) => {
     setEditTarea(tarea)
     setEditForm({
+      actividad: tarea.actividad || 'Agricola',
       tipo: tarea.tipo || 'Siembra',
       fecha: tarea.fecha || '',
       campo: tarea.campo || '',
@@ -133,6 +150,11 @@ function Tareas() {
     await deleteDoc(doc(db, 'tareas', tarea.id))
   }
 
+  const filtered = useMemo(() => {
+    if (!tipoFiltro) return tareas
+    return tareas.filter((tarea) => tarea.actividad === tipoFiltro)
+  }, [tareas, tipoFiltro])
+
   return (
     <div className="page">
       <PageHeader
@@ -143,6 +165,15 @@ function Tareas() {
         <div className="card">
           <h2>Nueva tarea</h2>
           <form className="form-grid" onSubmit={handleSubmit}>
+            <select
+              className="input"
+              name="actividad"
+              value={form.actividad}
+              onChange={handleChange}
+            >
+              <option>Agricola</option>
+              <option>Ganaderia</option>
+            </select>
             <select
               className="input"
               name="tipo"
@@ -252,15 +283,17 @@ function Tareas() {
 
         <div className="card">
           <h2>Tareas registradas</h2>
-          {tareas.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="empty-state">No hay tareas cargadas.</div>
           ) : (
             <div className="table">
-              {tareas.map((tarea) => (
+              {filtered.map((tarea) => (
                 <div className="table-row" key={tarea.id}>
                   <div>
                     <strong>{tarea.tipo}</strong>
-                    <span>{tarea.fecha}</span>
+                    <span>
+                      {tarea.fecha} · {tarea.actividad || 'Sin tipo'}
+                    </span>
                   </div>
                   <div>
                     <span>{tarea.campo}</span>
@@ -313,6 +346,15 @@ function Tareas() {
         }
       >
         <form className="form-grid" id="edit-tarea-form" onSubmit={handleEditSubmit}>
+          <select
+            className="input"
+            name="actividad"
+            value={editForm?.actividad || 'Agricola'}
+            onChange={handleEditChange}
+          >
+            <option>Agricola</option>
+            <option>Ganaderia</option>
+          </select>
           <select
             className="input"
             name="tipo"

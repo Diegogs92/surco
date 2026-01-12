@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
   collection,
@@ -10,11 +10,13 @@ import {
   serverTimestamp,
   updateDoc,
 } from 'firebase/firestore'
+import { useSearchParams } from 'react-router-dom'
 import { db } from '../firebase.js'
 import PageHeader from '../components/PageHeader.jsx'
 import Modal from '../components/Modal.jsx'
 
 const initialForm = {
+  uso: 'Agricola',
   categoria: 'Semillas',
   nombre: '',
   stock: '',
@@ -30,6 +32,7 @@ function Insumos() {
   const [editForm, setEditForm] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
   const [proveedores, setProveedores] = useState([])
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
     const q = query(collection(db, 'insumos'), orderBy('createdAt', 'desc'))
@@ -54,6 +57,19 @@ function Insumos() {
     return () => unsubProv()
   }, [])
 
+  const tipoFiltro = useMemo(() => {
+    const tipo = searchParams.get('tipo')
+    if (tipo === 'ganadero' || tipo === 'ganadera') return 'Ganaderia'
+    if (tipo === 'agricola') return 'Agricola'
+    return ''
+  }, [searchParams])
+
+  useEffect(() => {
+    if (tipoFiltro) {
+      setForm((prev) => ({ ...prev, uso: tipoFiltro }))
+    }
+  }, [tipoFiltro])
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -74,6 +90,7 @@ function Insumos() {
   const openEdit = (insumo) => {
     setEditInsumo(insumo)
     setEditForm({
+      uso: insumo.uso || 'Agricola',
       categoria: insumo.categoria || 'Semillas',
       nombre: insumo.nombre || '',
       stock: insumo.stock || '',
@@ -107,6 +124,11 @@ function Insumos() {
     await deleteDoc(doc(db, 'insumos', insumo.id))
   }
 
+  const filtered = useMemo(() => {
+    if (!tipoFiltro) return insumos
+    return insumos.filter((insumo) => insumo.uso === tipoFiltro)
+  }, [insumos, tipoFiltro])
+
   return (
     <div className="page">
       <PageHeader
@@ -117,6 +139,10 @@ function Insumos() {
         <div className="card">
           <h2>Nuevo insumo</h2>
           <form className="form-grid" onSubmit={handleSubmit}>
+            <select className="input" name="uso" value={form.uso} onChange={handleChange}>
+              <option>Agricola</option>
+              <option>Ganaderia</option>
+            </select>
             <select
               className="input"
               name="categoria"
@@ -184,15 +210,17 @@ function Insumos() {
 
         <div className="card">
           <h2>Inventario</h2>
-          {insumos.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="empty-state">No hay insumos registrados.</div>
           ) : (
             <div className="table">
-              {insumos.map((insumo) => (
+              {filtered.map((insumo) => (
                 <div className="table-row" key={insumo.id}>
                   <div>
                     <strong>{insumo.nombre}</strong>
-                    <span>{insumo.categoria}</span>
+                    <span>
+                      {insumo.categoria} · {insumo.uso || 'Sin uso'}
+                    </span>
                   </div>
                   <div>
                     <span>
@@ -246,6 +274,15 @@ function Insumos() {
           id="edit-insumo-form"
           onSubmit={handleEditSubmit}
         >
+          <select
+            className="input"
+            name="uso"
+            value={editForm?.uso || 'Agricola'}
+            onChange={handleEditChange}
+          >
+            <option>Agricola</option>
+            <option>Ganaderia</option>
+          </select>
           <select
             className="input"
             name="categoria"
