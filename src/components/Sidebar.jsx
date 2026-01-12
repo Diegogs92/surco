@@ -68,6 +68,19 @@ function Sidebar() {
     setActiveGroup((prev) => (prev === key ? null : key))
   }
 
+  useEffect(() => {
+    if (!activeGroup) return
+    const handleKey = (event) => {
+      if (event.key === 'Escape') {
+        setActiveGroup(null)
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [activeGroup])
+
+  const activeGroupData = navGroups.find((group) => group.key === activeGroup)
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -101,27 +114,35 @@ function Sidebar() {
                 &gt;
               </span>
             </button>
-            {activeGroup === group.key && (
-              <div className="nav-panel">
-                <div className="nav-panel-grid">
-                  {group.items.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      className={({ isActive }) =>
-                        isActive ? 'nav-panel-link active' : 'nav-panel-link'
-                      }
-                      onClick={() => setActiveGroup(null)}
-                    >
-                      {item.label}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </nav>
+      {activeGroupData && (
+        <div className="nav-overlay" role="presentation" onClick={() => setActiveGroup(null)}>
+          <div className="nav-panel" onClick={(event) => event.stopPropagation()}>
+            <div className="nav-panel-header">
+              <span>{activeGroupData.label}</span>
+              <button className="icon-button" type="button" onClick={() => setActiveGroup(null)}>
+                Cerrar
+              </button>
+            </div>
+            <div className="nav-panel-grid">
+              {activeGroupData.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    isActive ? 'nav-panel-link active' : 'nav-panel-link'
+                  }
+                  onClick={() => setActiveGroup(null)}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="sidebar-footer">
         <p>Listo para campo y oficina.</p>
       </div>
