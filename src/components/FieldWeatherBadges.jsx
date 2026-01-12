@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../firebase.js'
+import {
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudDrizzle,
+  CloudLightning,
+} from 'lucide-react'
 
 const WEATHER_TIMEOUT_MS = 8000
 const WEATHER_CACHE_MS = 15 * 60 * 1000 // 15 minutos de cache
@@ -78,13 +86,13 @@ function FieldWeatherBadge({ campo }) {
 
   // Determinar icono según código de clima
   const getWeatherIcon = (code) => {
-    if (code >= 95) return '⛈️' // Tormenta
-    if (code >= 80) return '🌧️' // Lluvia fuerte
-    if (code >= 61) return '🌦️' // Lluvia
-    if (code >= 51) return '🌥️' // Llovizna
-    if (code >= 3) return '☁️' // Nublado
-    if (code >= 1) return '🌤️' // Parcialmente nublado
-    return '☀️' // Despejado
+    if (code >= 95) return CloudLightning // Tormenta
+    if (code >= 80) return CloudRain // Lluvia fuerte
+    if (code >= 61) return CloudRain // Lluvia
+    if (code >= 51) return CloudDrizzle // Llovizna
+    if (code >= 3) return Cloud // Nublado
+    if (code >= 1) return CloudSun // Parcialmente nublado
+    return Sun // Despejado
   }
 
   if (loading) {
@@ -105,11 +113,15 @@ function FieldWeatherBadge({ campo }) {
     )
   }
 
+  const WeatherIcon = getWeatherIcon(weather.code)
+
   return (
     <div className="field-weather-badge">
       <span className="field-name">{campo.nombre}</span>
       <span className="weather-info">
-        <span className="weather-icon">{getWeatherIcon(weather.code)}</span>
+        <span className="weather-icon">
+          <WeatherIcon size={14} />
+        </span>
         <span className="weather-temp">{weather.temp}°</span>
       </span>
     </div>

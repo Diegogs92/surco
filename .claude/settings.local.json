@@ -12,7 +12,8 @@
       "Bash(firebase projects:list:*)",
       "Bash(firebase use:*)",
       "Bash(firebase deploy:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(killall:*)"
     ],
     "deny": [],
     "ask": []

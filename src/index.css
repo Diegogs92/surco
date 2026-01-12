@@ -155,7 +155,7 @@ p {
   flex-direction: column;
   gap: 24px;
   backdrop-filter: blur(12px);
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .brand {
@@ -200,7 +200,7 @@ p {
   flex-direction: column;
   gap: 8px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .nav-group {
@@ -1274,8 +1274,10 @@ select:focus {
 }
 
 .field-weather-badge .weather-icon {
-  font-size: 14px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .field-weather-badge .weather-temp {
