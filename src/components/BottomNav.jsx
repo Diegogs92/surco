@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
-  { to: '/dashboard', label: 'Inicio' },
-  { to: '/campos', label: 'Campos' },
-  { to: '/tareas', label: 'Tareas' },
-  { to: '/maquinaria', label: 'Maquinaria' },
+  { to: '/dashboard', label: 'Inicio', icon: '🏠' },
+  { to: '/campos', label: 'Campos', icon: '🌾' },
+  { to: '/tareas', label: 'Tareas', icon: '✓' },
+  { to: '/reportes', label: 'Reportes', icon: '📈' },
 ]
 
 function BottomNav() {
@@ -18,7 +18,8 @@ function BottomNav() {
             isActive ? 'bottom-link active' : 'bottom-link'
           }
         >
-          {item.label}
+          <span className="bottom-link-icon">{item.icon}</span>
+          <span className="bottom-link-label">{item.label}</span>
         </NavLink>
       ))}
     </nav>

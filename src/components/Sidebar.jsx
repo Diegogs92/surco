@@ -1,85 +1,62 @@
-import { useEffect, useMemo, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 const navGroups = [
   {
-    key: 'compartidos',
-    label: 'Compartidos',
-    defaultOpen: true,
+    key: 'general',
+    label: 'General',
+    icon: '📊',
     items: [
-      { to: '/campos', label: 'Campos' },
-      { to: '/personal', label: 'Personal' },
-      { to: '/proveedores', label: 'Proveedores' },
-      { to: '/insumos', label: 'Insumos' },
-      { to: '/maquinaria', label: 'Maquinaria' },
-      { to: '/tareas', label: 'Tareas' },
-      { to: '/alertas', label: 'Alertas' },
-      { to: '/reportes', label: 'Reportes' },
+      { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
+      { to: '/campos', label: 'Campos', icon: '🌾' },
+      { to: '/reportes', label: 'Reportes', icon: '📈' },
+      { to: '/alertas', label: 'Alertas', icon: '🔔' },
+    ],
+  },
+  {
+    key: 'recursos',
+    label: 'Recursos',
+    icon: '🛠️',
+    items: [
+      { to: '/personal', label: 'Personal', icon: '👥' },
+      { to: '/proveedores', label: 'Proveedores', icon: '🤝' },
+      { to: '/insumos', label: 'Insumos', icon: '📦' },
+      { to: '/maquinaria', label: 'Maquinaria', icon: '🚜' },
     ],
   },
   {
     key: 'agricultura',
     label: 'Agricultura',
-    defaultOpen: true,
+    icon: '🌱',
     items: [
-      { to: '/lotes-agricolas', label: 'Lotes agricolas' },
-      { to: '/cultivos', label: 'Cultivos' },
-      { to: '/campanas', label: 'Campanas' },
-      { to: '/registros-agricolas', label: 'Siembra y cosecha' },
-      { to: '/insumos?tipo=agricola', label: 'Insumos agricolas' },
-      { to: '/maquinaria?tipo=agricola', label: 'Maquinaria agricola' },
-      { to: '/tareas?tipo=agricola', label: 'Tareas agricolas' },
-      { to: '/alertas?tipo=meteorologica', label: 'Alertas meteorologicas' },
+      { to: '/lotes-agricolas', label: 'Lotes agrícolas', icon: '🗺️' },
+      { to: '/cultivos', label: 'Cultivos', icon: '🌿' },
+      { to: '/campanas', label: 'Campañas', icon: '📅' },
+      { to: '/registros-agricolas', label: 'Siembra y cosecha', icon: '🌾' },
+      { to: '/tareas', label: 'Tareas', icon: '✓' },
     ],
   },
   {
     key: 'ganaderia',
-    label: 'Ganaderia',
-    defaultOpen: false,
+    label: 'Ganadería',
+    icon: '🐄',
     items: [
-      { to: '/ganaderia', label: 'Gestion ganadera' },
-      { to: '/insumos?tipo=ganadero', label: 'Insumos ganaderos' },
-      { to: '/maquinaria?tipo=ganadera', label: 'Maquinaria ganadera' },
-      { to: '/tareas?tipo=ganadera', label: 'Tareas ganaderas' },
+      { to: '/ganaderia', label: 'Gestión ganadera', icon: '🐮' },
+      { to: '/insumos?tipo=ganadero', label: 'Insumos ganaderos', icon: '🍖' },
+      { to: '/maquinaria?tipo=ganadera', label: 'Maquinaria ganadera', icon: '🚜' },
+      { to: '/tareas?tipo=ganadera', label: 'Tareas ganaderas', icon: '📋' },
     ],
   },
 ]
 
 function Sidebar() {
-  const location = useLocation()
-  const [activeGroup, setActiveGroup] = useState(null)
-
-  const activeGroupKeys = useMemo(() => {
-    return navGroups
-      .filter((group) =>
-        group.items.some(
-          (item) => item.to.split('?')[0] === location.pathname,
-        ),
-      )
-      .map((group) => group.key)
-  }, [location.pathname])
-
-  useEffect(() => {
-    if (!activeGroupKeys.length) return
-    setActiveGroup((prev) => prev || activeGroupKeys[0])
-  }, [activeGroupKeys])
+  const [openGroups, setOpenGroups] = useState(['general', 'agricultura'])
 
   const toggleGroup = (key) => {
-    setActiveGroup((prev) => (prev === key ? null : key))
+    setOpenGroups((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    )
   }
-
-  useEffect(() => {
-    if (!activeGroup) return
-    const handleKey = (event) => {
-      if (event.key === 'Escape') {
-        setActiveGroup(null)
-      }
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [activeGroup])
-
-  const activeGroupData = navGroups.find((group) => group.key === activeGroup)
 
   return (
     <aside className="sidebar">
@@ -87,64 +64,47 @@ function Sidebar() {
         <img className="brand-logo" src="/surco%20logo.svg" alt="Surco" />
         <div>
           <p className="brand-title">Surco</p>
-          <p className="brand-subtitle">Gestion agricola al maximo nivel</p>
+          <p className="brand-subtitle">Gestión agrícola profesional</p>
         </div>
       </div>
       <nav className="nav">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-        >
-          Dashboard
-        </NavLink>
-        {navGroups.map((group) => (
-          <div className="nav-group" key={group.key}>
-            <button
-              className={`nav-group-toggle ${
-                activeGroup === group.key ? 'active' : ''
-              }`}
-              type="button"
-              onClick={() => toggleGroup(group.key)}
-              aria-expanded={activeGroup === group.key}
-            >
-              <span className="nav-group-title">{group.label}</span>
-              <span
-                className={`nav-group-icon ${activeGroup === group.key ? 'open' : ''}`}
+        {navGroups.map((group) => {
+          const isOpen = openGroups.includes(group.key)
+          return (
+            <div key={group.key} className="nav-group">
+              <button
+                type="button"
+                className="nav-group-header"
+                onClick={() => toggleGroup(group.key)}
               >
-                &gt;
-              </span>
-            </button>
-          </div>
-        ))}
-      </nav>
-      {activeGroupData && (
-        <div className="nav-overlay" role="presentation" onClick={() => setActiveGroup(null)}>
-          <div className="nav-panel" onClick={(event) => event.stopPropagation()}>
-            <div className="nav-panel-header">
-              <span>{activeGroupData.label}</span>
-              <button className="icon-button" type="button" onClick={() => setActiveGroup(null)}>
-                Cerrar
+                <span className="nav-group-icon">{group.icon}</span>
+                <span className="nav-group-label">{group.label}</span>
+                <span className={`nav-group-chevron ${isOpen ? 'open' : ''}`}>
+                  ›
+                </span>
               </button>
+              {isOpen && (
+                <div className="nav-group-items">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `nav-item ${isActive ? 'active' : ''}`
+                      }
+                    >
+                      <span className="nav-item-icon">{item.icon}</span>
+                      <span className="nav-item-label">{item.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="nav-panel-grid">
-              {activeGroupData.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    isActive ? 'nav-panel-link active' : 'nav-panel-link'
-                  }
-                  onClick={() => setActiveGroup(null)}
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+          )
+        })}
+      </nav>
       <div className="sidebar-footer">
-        <p>Listo para campo y oficina.</p>
+        <p>Listo para campo y oficina</p>
       </div>
     </aside>
   )
